@@ -1,211 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Faizan Store</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-/* --- RESET --- */
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial, sans-serif;}
-body{background:#fff;color:#000;transition:background 0.3s, color 0.3s;}
-a{text-decoration:none;color:inherit;}
-button{cursor:pointer;transition:0.2s}
-
-/* --- HEADER --- */
-header{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;background:#f8f8f8;position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
-header input[type=search]{flex:1;padding:8px;margin-right:10px;border-radius:8px;border:1px solid #ccc;}
-header button{padding:8px 12px;border:none;border-radius:8px;background:linear-gradient(45deg,#00aaff,#00ff99);color:#fff;font-weight:bold;}
-
-/* --- FILTER BUTTONS --- */
-.filters{display:flex;justify-content:center;gap:10px;padding:10px;flex-wrap:wrap;}
-.filters button{padding:6px 12px;border-radius:8px;border:1px solid #ccc;background:#eee;font-weight:bold;}
-
-/* --- GRID CARDS --- */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:12px;}
-.card{background:#f5f5f5;border-radius:12px;padding:10px;position:relative;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.1);transition:transform 0.2s, box-shadow 0.2s;}
-.card:hover{transform:translateY(-4px);box-shadow:0 6px 12px rgba(0,0,0,0.2);}
-.card img{width:100%;height:100px;object-fit:cover;border-radius:10px;}
-.card .title{font-size:14px;margin:6px 0;font-weight:bold;}
-.card .cat{font-size:12px;color:#666;}
-.card .owner{font-size:11px;color:#0077cc;cursor:pointer;}
-.trending{position:absolute;top:6px;left:6px;background:#ff9800;color:#000;font-size:11px;padding:2px 6px;border-radius:6px;font-weight:bold;}
-
-/* --- HORIZONTAL CAROUSEL --- */
-.horizontal{display:flex;overflow-x:auto;padding:10px;gap:12px;}
-.horizontal::-webkit-scrollbar{height:6px;}
-.horizontal::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px;}
-.horizontal::-webkit-scrollbar-track{background:#f5f5f5;}
-
-/* --- DETAILS PAGE --- */
-#details{display:none;padding:12px;}
-#details .back{padding:6px 12px;background:#00aaff;color:#fff;border:none;border-radius:6px;margin-bottom:10px;display:inline-block;}
-#details img.icon{width:80px;height:80px;border-radius:12px;object-fit:cover;}
-#details .btn{padding:6px 10px;border:none;border-radius:6px;background:#eee;color:#000;margin:2px;cursor:pointer;}
-#details .screens{display:flex;overflow-x:auto;gap:8px;margin:10px 0;}
-#details .screens img,#details .screens video{height:120px;border-radius:8px;object-fit:cover;}
-#recommended{margin-top:20px;}
-#recommended .rec-card{background:#eee;padding:8px;border-radius:8px;display:flex;align-items:center;gap:8px;margin:5px 0;color:#000;}
-#recommended .rec-card img{width:40px;height:40px;border-radius:6px;object-fit:cover;}
-
-/* --- SETTINGS MODAL --- */
-#settingsModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:200;padding:20px;overflow:auto;color:#000;}
-#settingsModal label{display:block;margin-top:10px;font-weight:bold;}
-#settingsModal select,input{padding:6px;margin-top:4px;width:100%;border-radius:6px;border:1px solid #ccc;}
-#settingsModal button{margin-top:10px;background:#00aaff;color:#fff;padding:8px 12px;border:none;border-radius:6px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faizan Store | Modern App Market</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .dark .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    </style>
 </head>
-<body>
+<body x-data="appStore()" :class="darkMode ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'" x-cloak>
 
-<header>
-  <input type="search" id="search" placeholder="Search Games or Apps" oninput="filterList()">
-  <button onclick="toggleSettings()">⚙️ Settings</button>
-</header>
+    <header class="sticky top-0 z-40 w-full px-4 py-3 border-b flex items-center justify-between gap-4" :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'">
+        <div class="flex items-center font-bold text-xl tracking-tight text-blue-600" @click="resetFilters()">Faizan Store</div>
+        <div class="flex-1 max-w-md relative">
+            <input type="text" x-model="searchQuery" placeholder="Search apps..." class="w-full pl-10 pr-4 py-2 rounded-full border focus:outline-none focus:ring-2 focus:ring-blue-500 transition" :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-100 border-transparent'">
+            <span class="absolute left-3 top-2.5 opacity-50">🔍</span>
+        </div>
+        <button @click="showSettings = true" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">⚙️</button>
+    </header>
 
-<div class="filters">
-  <button onclick="setType('all')">🏠 All</button>
-  <button onclick="setType('game')">🎮 Game</button>
-  <button onclick="setType('app')">❓ App</button>
-</div>
+    <main x-show="!viewingDetail" class="pb-20">
+        
+        <div class="flex gap-2 p-4 overflow-x-auto no-scrollbar">
+            <template x-for="type in ['All', 'Game', 'App']">
+                <button @click="filterType = type.toLowerCase()" 
+                        :class="filterType === type.toLowerCase() ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800' : 'bg-white')"
+                        class="px-6 py-2 rounded-full shadow-sm font-semibold transition whitespace-nowrap"
+                        x-text="type"></button>
+            </template>
+        </div>
 
-<h3 style="padding-left:12px;">🔥 Trending</h3>
-<div id="trending" class="horizontal"></div>
+        <section class="mb-8">
+            <h2 class="px-4 text-xl font-bold mb-3 flex items-center">🔥 Trending</h2>
+            <div class="flex gap-4 overflow-x-auto px-4 no-scrollbar">
+                <template x-for="app in filteredApps.filter(a => trendingIds.includes(a.id))">
+                    <div @click="openDetail(app)" class="min-w-[140px] cursor-pointer group">
+                        <img :src="getIcon(app.icon)" class="w-28 h-28 rounded-3xl mb-2 group-hover:scale-105 transition duration-300 card-shadow">
+                        <div class="text-sm font-semibold truncate" x-text="app.name"></div>
+                        <div class="text-xs opacity-60" x-text="app.category"></div>
+                    </div>
+                </template>
+            </div>
+        </section>
 
-<h3 style="padding-left:12px;">🎁 Featured / Random Category</h3>
-<div id="randomCategory" class="horizontal"></div>
+        <section class="mb-8" x-show="randomCategory">
+            <h2 class="px-4 text-xl font-bold mb-3 flex items-center">✨ Featured: <span class="ml-2 text-blue-500" x-text="randomCategory"></span></h2>
+            <div class="flex gap-4 overflow-x-auto px-4 no-scrollbar">
+                <template x-for="app in apps.filter(a => a.category === randomCategory)">
+                    <div @click="openDetail(app)" class="min-w-[140px] cursor-pointer group">
+                        <img :src="getIcon(app.icon)" class="w-24 h-24 rounded-2xl mb-2 group-hover:scale-105 transition duration-300 shadow">
+                        <div class="text-xs font-semibold truncate" x-text="app.name"></div>
+                    </div>
+                </template>
+            </div>
+        </section>
 
-<div id="list" class="grid"></div>
+        <section class="px-4">
+            <h2 class="text-xl font-bold mb-4">Discover</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <template x-for="app in filteredApps" :key="app.id">
+                    <div @click="openDetail(app)" class="p-3 rounded-2xl transition-all duration-300 active:scale-95 cursor-pointer flex flex-col items-center text-center" :class="darkMode ? 'bg-gray-800' : 'bg-white card-shadow'">
+                        <div class="relative">
+                            <img :src="getIcon(app.icon)" class="w-20 h-20 rounded-2xl mb-2">
+                            <template x-if="trendingIds.includes(app.id)">
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-2 py-0.5 rounded-full uppercase font-bold">Hot</span>
+                            </template>
+                        </div>
+                        <div class="text-sm font-bold truncate w-full" x-text="app.name"></div>
+                        <div class="text-[10px] uppercase tracking-wider opacity-50 mb-1" x-text="app.category"></div>
+                        <div class="text-[10px] text-blue-500 font-medium" x-text="app.owner"></div>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </main>
 
-<div id="details">
-  <button class="back" onclick="backToList()">← Back</button>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <img class="icon" id="detailIcon">
-    <div>
-      <h2 id="detailName"></h2>
-      <button class="btn" id="ownerBtn"></button>
+    <main x-show="viewingDetail" class="fixed inset-0 z-50 overflow-y-auto" :class="darkMode ? 'bg-gray-900' : 'bg-white'">
+        <template x-if="selectedApp">
+            <div class="pb-10">
+                <div class="p-4 flex items-center justify-between sticky top-0 bg-inherit z-10">
+                    <button @click="viewingDetail = false" class="text-2xl">←</button>
+                    <div class="font-bold truncate px-4" x-text="selectedApp.name"></div>
+                    <div class="w-8"></div>
+                </div>
+
+                <div class="p-4 flex gap-4">
+                    <img :src="getIcon(selectedApp.icon)" class="w-24 h-24 rounded-3xl card-shadow">
+                    <div class="flex flex-col justify-center">
+                        <h1 class="text-2xl font-bold" x-text="selectedApp.name"></h1>
+                        <button @click="setOwnerFilter(selectedApp.owner)" class="text-blue-500 text-sm font-semibold text-left" x-text="selectedApp.owner"></button>
+                        <div class="text-xs opacity-50" x-text="selectedApp.package || 'N/A'"></div>
+                    </div>
+                </div>
+
+                <div class="px-4 py-2 flex gap-4 overflow-x-auto no-scrollbar">
+                    <div class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg font-bold">Install</div>
+                    <button @click="setCategoryFilter(selectedApp.category)" class="px-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm" x-text="selectedApp.category"></button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 p-4 border-y my-4" :class="darkMode ? 'border-gray-800' : 'border-gray-100'">
+                    <div class="text-center"><div class="text-xs opacity-50">Released</div><div class="text-sm font-bold" x-text="selectedApp.releaseDate"></div></div>
+                    <div class="text-center"><div class="text-xs opacity-50">Updated</div><div class="text-sm font-bold" x-text="selectedApp.lastUpdate"></div></div>
+                    <div class="text-center"><div class="text-xs opacity-50">Versions</div><div class="text-sm font-bold" x-text="selectedApp.versions.length"></div></div>
+                </div>
+
+                <div class="flex gap-3 overflow-x-auto px-4 mb-6 no-scrollbar">
+                    <template x-for="ss in selectedApp.assets.screenshots">
+                        <img :src="ss" class="h-64 rounded-xl shadow-sm">
+                    </template>
+                </div>
+
+                <div class="px-4 mb-6">
+                    <h3 class="font-bold mb-2">About this game</h3>
+                    <p class="text-sm opacity-80 leading-relaxed" x-text="selectedApp.description"></p>
+                </div>
+
+                <div class="px-4 mb-6">
+                    <h3 class="font-bold mb-3">Versions</h3>
+                    <div class="space-y-2">
+                        <template x-for="v in selectedApp.versions">
+                            <div class="flex items-center justify-between p-3 rounded-xl" :class="darkMode ? 'bg-gray-800' : 'bg-gray-100'">
+                                <span class="font-mono font-bold" x-text="'v' + v.ver"></span>
+                                <a :href="v.url" class="text-blue-500 font-bold">Download</a>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="px-4">
+                    <h3 class="font-bold mb-3">Similar to this</h3>
+                    <div class="flex gap-4 overflow-x-auto no-scrollbar">
+                        <template x-for="rec in apps.filter(a => a.type === selectedApp.type && a.id !== selectedApp.id)">
+                            <div @click="openDetail(rec)" class="min-w-[100px] text-center">
+                                <img :src="getIcon(rec.icon)" class="w-16 h-16 rounded-xl mx-auto mb-1">
+                                <div class="text-[10px] font-bold truncate" x-text="rec.name"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </main>
+
+    <div x-show="showSettings" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4 bg-black bg-opacity-50">
+        <div @click.away="showSettings = false" class="w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-6 transition-all" :class="darkMode ? 'bg-gray-800' : 'bg-white'">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Settings</h2>
+                <button @click="showSettings = false" class="text-xl">×</button>
+            </div>
+
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <span>Dark Mode</span>
+                    <button @click="darkMode = !darkMode" class="w-12 h-6 rounded-full relative transition" :class="darkMode ? 'bg-blue-600' : 'bg-gray-300'">
+                        <div class="absolute top-1 w-4 h-4 rounded-full bg-white transition-all" :class="darkMode ? 'right-1' : 'left-1'"></div>
+                    </button>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Release Date Range</label>
+                    <div class="flex gap-2">
+                        <input type="date" x-model="dateStart" class="flex-1 text-xs p-2 rounded border dark:bg-gray-700 dark:border-gray-600">
+                        <input type="date" x-model="dateEnd" class="flex-1 text-xs p-2 rounded border dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Sort By</label>
+                    <select x-model="sortBy" class="w-full p-2 rounded border dark:bg-gray-700 dark:border-gray-600">
+                        <option value="default">Default</option>
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button @click="showSettings = false" class="w-full mt-8 py-3 bg-blue-600 text-white rounded-xl font-bold">Apply & Close</button>
+        </div>
     </div>
-  </div>
-  <h3>About This App</h3>
-  <p><b>Game Name:</b> <span id="detailGName"></span></p>
-  <p><b>Package:</b> <span id="detailPackage"></span></p>
-  <p><b>Release:</b> <span id="detailRelease"></span></p>
-  <p><b>Last Update:</b> <span id="detailUpdate"></span></p>
-  <p><b>Version:</b> <span id="detailVersion"></span></p>
-  <p><b>Type:</b> <span id="detailType"></span></p>
-  <p><b>Category:</b> <button class="btn" id="detailCategory"></button></p>
-  <p id="detailDesc"></p>
 
-  <h3>Screenshots & Video</h3>
-  <div id="detailMedia" class="screens"></div>
+    <script>
+        function appStore() {
+            return {
+                apps: [],
+                trendingIds: [],
+                searchQuery: '',
+                filterType: 'all',
+                filterOwner: '',
+                filterCategory: '',
+                randomCategory: '',
+                darkMode: false,
+                showSettings: false,
+                viewingDetail: false,
+                selectedApp: null,
+                sortBy: 'default',
+                dateStart: '',
+                dateEnd: '',
 
-  <h3>Recommended</h3>
-  <div id="recommended"></div>
-</div>
+                async init() {
+                    try {
+                        const response = await fetch('info.json');
+                        const data = await response.json();
+                        this.apps = data.apps;
+                        this.trendingIds = data.trending_ids;
+                        
+                        // Select a random category for featured section
+                        const categories = [...new Set(this.apps.map(a => a.category))];
+                        this.randomCategory = categories[Math.floor(Math.random() * categories.length)];
+                    } catch (e) {
+                        console.error("Error loading JSON", e);
+                    }
+                },
 
-<!-- SETTINGS MODAL -->
-<div id="settingsModal">
-  <h3>⚙ Advanced Settings</h3>
-  <label>Start Date:</label>
-  <input type="date" id="startDate">
-  <label>End Date:</label>
-  <input type="date" id="endDate">
-  <label>Theme:</label>
-  <select id="themeSelect" onchange="changeTheme()">
-    <option value="light">Light Theme</option>
-    <option value="dark">Dark Theme</option>
-  </select>
-  <label>Sort By:</label>
-  <select id="sortSelect" onchange="filterList()">
-    <option value="default">Default</option>
-    <option value="oldest">Oldest → Newest</option>
-    <option value="newest">Newest → Oldest</option>
-  </select>
-  <button onclick="toggleSettings()">Close</button>
-</div>
+                get filteredApps() {
+                    return this.apps
+                        .filter(app => {
+                            const matchesSearch = app.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+                            const matchesType = this.filterType === 'all' || app.type === this.filterType;
+                            const matchesOwner = !this.filterOwner || app.owner === this.filterOwner;
+                            const matchesCategory = !this.filterCategory || app.category === this.filterCategory;
+                            
+                            // Date Range Filter
+                            let matchesDate = true;
+                            if (this.dateStart) matchesDate = matchesDate && (new Date(app.releaseDate) >= new Date(this.dateStart));
+                            if (this.dateEnd) matchesDate = matchesDate && (new Date(app.releaseDate) <= new Date(this.dateEnd));
 
-<script>
-let DATA={}; let currentType='all';
+                            return matchesSearch && matchesType && matchesOwner && matchesCategory && matchesDate;
+                        })
+                        .sort((a, b) => {
+                            if (this.sortBy === 'newest') return new Date(b.releaseDate) - new Date(a.releaseDate);
+                            if (this.sortBy === 'oldest') return new Date(a.releaseDate) - new Date(b.releaseDate);
+                            return 0;
+                        });
+                },
 
-fetch('info.json').then(r=>r.json()).then(j=>{DATA=j; populateTrending(); populateRandomCategory(); filterList();});
+                getIcon(path) {
+                    if (!path || path === 'FS' || path === '%%FS') {
+                        return `https://via.placeholder.com/150/3b82f6/ffffff?text=Faizan+Store`;
+                    }
+                    return path;
+                },
 
-function toggleSettings(){document.getElementById('settingsModal').style.display = document.getElementById('settingsModal').style.display==='none'?'block':'none';}
+                openDetail(app) {
+                    this.selectedApp = app;
+                    this.viewingDetail = true;
+                    window.scrollTo(0, 0);
+                },
 
-function changeTheme(){
-  const theme=document.getElementById('themeSelect').value;
-  if(theme==='dark'){document.body.style.background='#121212'; document.body.style.color='#eee';} 
-  else {document.body.style.background='#fff'; document.body.style.color='#000';}
-}
+                setOwnerFilter(owner) {
+                    this.filterOwner = owner;
+                    this.viewingDetail = false;
+                },
 
-function setType(t){currentType=t; filterList();}
+                setCategoryFilter(cat) {
+                    this.filterCategory = cat;
+                    this.viewingDetail = false;
+                },
 
-function populateTrending(){
-  const div=document.getElementById('trending'); div.innerHTML='';
-  DATA.apps.forEach(g=>{if(DATA.trending_ids.includes(g.id)) div.appendChild(createCard(g));});
-}
-
-function populateRandomCategory(){
-  const div=document.getElementById('randomCategory'); div.innerHTML='';
-  const cats=[...new Set(DATA.apps.map(a=>a.category).filter(c=>c))];
-  const randomCat=cats[Math.floor(Math.random()*cats.length)];
-  DATA.apps.filter(a=>a.category===randomCat).forEach(g=>div.appendChild(createCard(g)));
-}
-
-function filterList(){
-  const list=document.getElementById('list'); list.innerHTML='';
-  let apps=DATA.apps.filter(a=>currentType==='all'||a.type===currentType);
-  const search=document.getElementById('search').value.toLowerCase();
-  if(search) apps=apps.filter(a=>a.name.toLowerCase().includes(search));
-  // Date filter
-  const start=document.getElementById('startDate').value;
-  const end=document.getElementById('endDate').value;
-  if(start) apps=apps.filter(a=>new Date(a.releaseDate)>=new Date(start));
-  if(end) apps=apps.filter(a=>new Date(a.releaseDate)<=new Date(end));
-  // Sorting
-  const sort=document.getElementById('sortSelect').value;
-  if(sort==='oldest') apps.sort((a,b)=>new Date(a.releaseDate)-new Date(b.releaseDate));
-  else if(sort==='newest') apps.sort((a,b)=>new Date(b.releaseDate)-new Date(a.releaseDate));
-  apps.forEach(g=>list.appendChild(createCard(g)));
-}
-
-function createCard(g){
-  const div=document.createElement('div'); div.className='card'; div.onclick=()=>showDetails(g);
-  let iconSrc=(g.icon==='%%FS'||g.icon==='FS')?'https://via.placeholder.com/100x100?text=Faizan+Store':g.icon||'https://via.placeholder.com/100x100?text=N/A';
-  div.innerHTML=`${DATA.trending_ids.includes(g.id)?'<div class="trending">TRENDING</div>':''}
-    <img src="${iconSrc}">
-    <div class="title">${g.name||'N/A'}</div>
-    <div class="cat">${g.category||'N/A'}</div>
-    <div class="owner">${g.owner||'N/A'}</div>`;
-  return div;
-}
-
-function showDetails(g){
-  document.getElementById('details').style.display='block';
-  document.getElementById('list').style.display='none';
-  document.getElementById('trending').style.display='none';
-  document.getElementById('randomCategory').style.display='none';
-  document.getElementById('detailIcon').src=(g.icon==='%%FS'||g.icon==='FS')?'https://via.placeholder.com/80x80?text=Faizan+Store':g.icon||'https://via.placeholder.com/80x80?text=N/A';
-  document.getElementById('detailName').innerText=g.name||'N/A';
-  const ownerBtn=document.getElementById('ownerBtn'); ownerBtn.innerText=g.owner||'N/A'; ownerBtn.onclick=()=>filterByOwner(g.owner);
-  document.getElementById('detailGName').innerText=g.name||'N/A';
-  document.getElementById('detailPackage').innerText=g.package||'N/A';
-  document.getElementById('detailRelease').innerText=g.releaseDate||'N/A';
-  document.getElementById('detailUpdate').innerText=g.lastUpdate||'N/A';
-  document.getElementById('detailVersion').innerText=g.versions?.length||1;
-  document.getElementById('detailType').innerText=g.type||'N/A';
-  const catBtn=document.getElementById('detailCategory'); catBtn.innerText=g.category||'N/A'; catBtn.onclick=()=>filterByCategory(g.category);
-  const descEl=document.getElementById('detailDesc'); descEl.innerText=g.description||'N/A';
-  const mediaDiv=document.getElementById('detailMedia'); mediaDiv.innerHTML='';
-  if(g.assets?.screenshots) g.assets.screenshots.forEach(s=>{const img=document.createElement('img'); img.src=s; mediaDiv.appendChild(img);});
-  if(g.assets?.video){const video=document.createElement('video'); video.src=g.assets.video; video.controls=true; mediaDiv.appendChild(video);}
-  const recDiv=document.getElementById('recommended'); recDiv.innerHTML='';
-  DATA.apps.filter(a=>a.id!==g.id&&a.type===g.type).forEach(r=>{const rec=document.createElement('div'); rec.className='rec-card'; rec.innerHTML=`<img src="${(r.icon==='%%FS'||r.icon==='FS')?'https://via.placeholder.com/40x40?text=FS':r.icon||'https://via.placeholder.com/40x40?text=N/A'}"><div><b>${r.name||'N/A'}</b><br><small>${r.category||'N/A'}</small></div>`; recDiv.appendChild(rec);});
-}
-
-function backToList(){document.getElementById('details').style.display='none'; document.getElementById('list').style.display='grid'; document.getElementById('trending').style.display='flex'; document.getElementById('randomCategory').style.display='flex';}
-
-function filterByOwner(owner){currentType='all'; const list=document.getElementById('list'); list.innerHTML=''; DATA.apps.filter(a=>a.owner===owner).forEach(a=>list.appendChild(createCard(a));}
-
-function filterByCategory(cat){currentType='all'; const list=document.getElementById('list'); list.innerHTML=''; DATA.apps.filter(a=>a.category===cat).forEach(a=>list.appendChild(createCard(a));}
-</script>
-
+                resetFilters() {
+                    this.filterType = 'all';
+                    this.filterOwner = '';
+                    this.filterCategory = '';
+                    this.searchQuery = '';
+                    this.viewingDetail = false;
+                }
+            }
+        }
+    </script>
 </body>
-</html>
+                          </html>
+  
