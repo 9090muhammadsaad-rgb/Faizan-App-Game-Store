@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Game Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;font-family:sans-serif;background:#0f0f0f;color:#fff}
+header{padding:15px;background:#121212;font-size:20px;font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:12px}
+.card{background:#1b1b1b;border-radius:12px;padding:10px;position:relative}
+.card img{width:100%;border-radius:10px}
+.title{font-size:15px;margin:6px 0}
+.cat{font-size:12px;color:#aaa}
+.trending{position:absolute;top:8px;left:8px;
+background:#ff9800;color:#000;font-size:11px;
+padding:3px 6px;border-radius:6px;font-weight:bold}
+.details{padding:15px}
+button{width:100%;padding:10px;border:0;
+border-radius:8px;background:#00ff99;font-weight:bold}
+.screens{display:flex;overflow-x:auto;gap:8px}
+.screens img{height:120px;border-radius:8px}
+</style>
+</head>
+<body>
+
+<header>🎮 Game Store</header>
+
+<div id="list" class="grid"></div>
+
+<div id="details" class="details"></div>
+
+<script>
+let DATA;
+
+fetch("info.json")
+.then(r=>r.json())
+.then(j=>{
+  DATA=j;
+  showList();
+});
+
+function showList(){
+  const list=document.getElementById("list");
+  list.innerHTML="";
+  DATA.apps.forEach(g=>{
+    const div=document.createElement("div");
+    div.className="card";
+    div.onclick=()=>showDetails(g);
+
+    div.innerHTML=`
+      ${DATA.trending_ids.includes(g.id)?'<div class="trending">TRENDING</div>':''}
+      <img src="${g.icon}">
+      <div class="title">${g.name}</div>
+      <div class="cat">${g.category}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function showDetails(g){
+  document.getElementById("details").innerHTML=`
+    <h2>${g.name}</h2>
+    <p>${g.description}</p>
+
+    ${g.assets?.video?`
+      <video controls width="100%" src="${g.assets.video}"></video>
+    `:""}
+
+    <h3>Screenshots</h3>
+    <div class="screens">
+      ${(g.assets?.screenshots||[]).map(s=>`<img src="${s}">`).join("")}
+    </div>
+
+    <h3>Versions</h3>
+    ${g.versions.map(v=>`
+      <button onclick="location.href='${v.url}'">
+        Download v${v.ver}
+      </button>
+    `).join("<br><br>")}
+  `;
+}
+</script>
+
+</body>
+</html>
