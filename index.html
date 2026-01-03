@@ -1,37 +1,199 @@
-{
-  "trending_ids": ["g1", "a1"],
-  "apps": [
-    {
-      "id": "g1",
-      "name": "Cyber Racer X",
-      "package": "com.faizan.cyberracer",
-      "owner": "Faizan Games",
-      "size": "1.2 GB",
-      "keywords": ["fast", "car", "neon", "racing"],
-      "type": "game",
-      "category": "Racing",
-      "description": "High-speed racing in a neon world...",
-      "releaseDate": "2024-01-15",
-      "lastUpdate": "2025-11-20",
-      "icon": "%%FS",
-      "assets": { "screenshots": ["https://picsum.photos/seed/g1/400/700"], "video": "" },
-      "versions": [{"ver": "1.2.0", "url": "#"}]
-    },
-    {
-      "id": "a1",
-      "name": "QuickEdit Pro",
-      "package": "com.faizan.editor",
-      "owner": "Faizan Apps",
-      "size": "85 MB",
-      "keywords": ["photo", "video", "filter", "editor"],
-      "type": "app",
-      "category": "Productivity",
-      "description": "Professional editing tools...",
-      "releaseDate": "2023-05-10",
-      "lastUpdate": "2025-12-01",
-      "icon": "https://picsum.photos/seed/a1/128",
-      "assets": { "screenshots": ["https://picsum.photos/seed/a1s1/400/700"], "video": "" },
-      "versions": [{"ver": "2.4.5", "url": "#"}]
-    }
-  ]
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faizan Store Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass-header { backdrop-filter: blur(10px); background: rgba(255,255,255,0.8); }
+        .dark .glass-header { background: rgba(17, 24, 39, 0.8); }
+        .card-anim { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .card-anim:active { transform: scale(0.95); }
+    </style>
+</head>
+<body x-data="storeCore()" :class="darkMode ? 'dark bg-gray-950 text-gray-100' : 'bg-gray-50 text-gray-900'" x-cloak>
+
+    <nav class="sticky top-0 z-50 glass-header border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3">
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">Faizan</h1>
+        <div class="flex-1 relative group">
+            <span class="absolute left-3 top-2.5 opacity-40">🔍</span>
+            <input type="text" x-model="searchQuery" placeholder="Search games, apps, keywords..." 
+                   class="w-full pl-10 pr-4 py-2 rounded-2xl bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500 transition-all outline-none">
+        </div>
+        <button @click="showSettings = true" class="p-2.5 bg-gray-100 dark:bg-gray-800 rounded-2xl shadow-sm">⚙️</button>
+    </nav>
+
+    <main x-show="!viewingDetail" class="p-4 max-w-4xl mx-auto">
+        <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar pb-2">
+            <template x-for="t in ['All', 'Game', 'App']">
+                <button @click="filterType = t.toLowerCase()" 
+                        :class="filterType === t.toLowerCase() ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-white dark:bg-gray-900'"
+                        class="px-5 py-2 rounded-xl font-semibold transition-all border dark:border-gray-800 whitespace-nowrap"
+                        x-text="t"></button>
+            </template>
+        </div>
+
+        <div class="mb-8" x-show="!searchQuery && filterType === 'all'">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2">🔥 Trending <span class="h-1 flex-1 bg-gray-100 dark:bg-gray-800 rounded"></span></h2>
+            <div class="flex gap-4 overflow-x-auto no-scrollbar pb-4">
+                <template x-for="app in apps.filter(a => trendingIds.includes(a.id))">
+                    <div @click="openDetail(app)" class="min-w-[130px] card-anim cursor-pointer">
+                        <img :src="getIcon(app.icon)" class="w-32 h-32 rounded-[2rem] shadow-xl border-4 border-white dark:border-gray-800">
+                        <p class="mt-2 font-bold text-sm truncate" x-text="app.name"></p>
+                        <p class="text-[10px] opacity-50 uppercase font-bold" x-text="app.size || 'N/A'"></p>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <template x-for="app in filteredApps" :key="app.id">
+                <div @click="openDetail(app)" class="p-4 rounded-[2rem] bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm card-anim relative overflow-hidden">
+                    <img :src="getIcon(app.icon)" class="w-16 h-16 rounded-2xl mb-3 mx-auto">
+                    <div class="text-center">
+                        <h3 class="font-bold text-sm truncate" x-text="app.name"></h3>
+                        <p class="text-[10px] text-blue-500 font-bold" x-text="app.category"></p>
+                        <div class="mt-2 flex items-center justify-center gap-1 text-[10px] opacity-60">
+                            <span>📦</span> <span x-text="app.size || 'N/A'"></span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </main>
+
+    <div x-show="viewingDetail" class="fixed inset-0 z-[60] bg-gray-50 dark:bg-gray-950 overflow-y-auto" x-transition>
+        <template x-if="selectedApp">
+            <div class="pb-20">
+                <div class="p-4 flex items-center gap-4">
+                    <button @click="viewingDetail = false" class="text-2xl p-2">✕</button>
+                    <div class="flex-1 font-bold truncate" x-text="selectedApp.name"></div>
+                </div>
+                
+                <div class="px-6 flex gap-6 items-start mt-4">
+                    <img :src="getIcon(selectedApp.icon)" class="w-28 h-28 rounded-3xl shadow-2xl">
+                    <div class="flex-1">
+                        <h1 class="text-2xl font-bold" x-text="selectedApp.name"></h1>
+                        <p class="text-blue-500 font-semibold mb-1" x-text="selectedApp.owner"></p>
+                        <div class="inline-block px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs" x-text="selectedApp.size"></div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 overflow-x-auto px-6 mt-8 no-scrollbar">
+                    <template x-for="ss in selectedApp.assets.screenshots">
+                        <img :src="ss" class="h-80 w-auto rounded-2xl border dark:border-gray-800">
+                    </template>
+                </div>
+
+                <div class="px-6 mt-8">
+                    <h2 class="text-lg font-bold mb-2">Description</h2>
+                    <p class="text-sm opacity-70 leading-relaxed" x-text="selectedApp.description"></p>
+                    
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <template x-for="kw in selectedApp.keywords">
+                            <span class="text-[10px] px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded">#<span x-text="kw"></span></span>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <div x-show="showSettings" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" x-transition>
+        <div class="w-full max-w-sm bg-white dark:bg-gray-900 rounded-[2.5rem] p-8">
+            <h2 class="text-2xl font-bold mb-6">Filter & Sort</h2>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="text-xs font-bold uppercase opacity-50 block mb-2">Order By</label>
+                    <select x-model="sortBy" class="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-xl outline-none">
+                        <option value="default">Default</option>
+                        <option value="size-asc">Size: Lowest to Highest</option>
+                        <option value="size-desc">Size: Highest to Lowest</option>
+                        <option value="newest">Newest Released</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <span class="font-bold">Dark Theme</span>
+                    <button @click="darkMode = !darkMode" class="w-14 h-7 bg-gray-200 dark:bg-blue-600 rounded-full relative transition-all">
+                        <div class="absolute top-1 w-5 h-5 bg-white rounded-full transition-all" :class="darkMode ? 'right-1' : 'left-1'"></div>
+                    </button>
+                </div>
+            </div>
+
+            <button @click="showSettings = false" class="w-full mt-8 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-500/40">Apply Changes</button>
+        </div>
+    </div>
+
+    <script>
+        function storeCore() {
+            return {
+                apps: [],
+                trendingIds: [],
+                searchQuery: '',
+                filterType: 'all',
+                darkMode: false,
+                showSettings: false,
+                viewingDetail: false,
+                selectedApp: null,
+                sortBy: 'default',
+
+                async init() {
+                    const res = await fetch('info.json');
+                    const data = await res.json();
+                    this.apps = data.apps;
+                    this.trendingIds = data.trending_ids;
+                },
+
+                // Logic to convert 100MB, 1.2GB etc to raw Bytes for sorting
+                sizeToBytes(sizeStr) {
+                    if (!sizeStr) return 0;
+                    const units = { 'B': 1, 'KB': 1024, 'MB': 1024*1024, 'GB': 1024*1024*1024, 'TB': 1024*1024*1024*1024 };
+                    const match = sizeStr.toUpperCase().match(/^(\d+(\.\d+)?)\s*(B|KB|MB|GB|TB)$/);
+                    if (!match) return 0;
+                    return parseFloat(match[1]) * units[match[3]];
+                },
+
+                get filteredApps() {
+                    let list = this.apps.filter(app => {
+                        const q = this.searchQuery.toLowerCase();
+                        const matchesSearch = app.name.toLowerCase().includes(q) || 
+                                            app.category.toLowerCase().includes(q) ||
+                                            (app.keywords && app.keywords.some(k => k.toLowerCase().includes(q)));
+                        
+                        const matchesType = this.filterType === 'all' || app.type === this.filterType;
+                        return matchesSearch && matchesType;
+                    });
+
+                    // Enhanced Sorting
+                    if (this.sortBy === 'size-asc') {
+                        list.sort((a, b) => this.sizeToBytes(a.size) - this.sizeToBytes(b.size));
+                    } else if (this.sortBy === 'size-desc') {
+                        list.sort((a, b) => this.sizeToBytes(b.size) - this.sizeToBytes(a.size));
+                    } else if (this.sortBy === 'newest') {
+                        list.sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
+                    }
+
+                    return list;
+                },
+
+                getIcon(path) {
+                    return (!path || path.includes('FS')) ? `https://ui-avatars.com/api/?name=Faizan+Store&background=0D8ABC&color=fff&size=128` : path;
+                },
+
+                openDetail(app) {
+                    this.selectedApp = app;
+                    this.viewingDetail = true;
+                }
+            }
+        }
+    </script>
+</body>
+                                                                                                                         </html>
+  
