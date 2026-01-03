@@ -1,25 +1,202 @@
 {
-  "trending_ids":["g1","g3"],
-  "apps":[
+  "trending_ids": ["g1","g3","g5"],
+
+  "apps": [
     {
-      "id":"g1",
-      "name":"Poppy Playtime Chapter 3",
-      "package":"com.mobentertainment.poppy3",
-      "owner":"MobEntertainment",
-      "type":"game",
-      "category":"Horror",
-      "description":"Survive the horror inside Playcare. Puzzle solving, new monsters, jump scares...",
-      "releaseDate":"2025-01-02",
-      "lastUpdate":"2025-12-30",
-      "uploadedDate":"2025-12-31",
-      "icon":"assets/icon/poppy.png",
-      "assets":{
-        "screenshots":["assets/screenshots/poppy1.jpg","assets/screenshots/poppy2.jpg"],
-        "video":"assets/video/poppy_trailer.mp4"
+      "id": "g1",
+      "name": "Poppy Playtime Chapter 3",
+      "package": "com.mobentertainment.poppy3",
+      "owner": "MobEntertainment",
+      "type": "game",
+      "category": "Horror",
+      "description": "Survive the horror inside Playcare. Puzzle solving, new monsters, jump scares...",
+      "releaseDate": "2025-01-02",
+      "lastUpdate": "2025-12-30",
+      "uploadedDate": "2025-12-31",
+      "icon": "%%FS",
+      "assets": {
+        "screenshots": ["assets/screenshots/poppy1.jpg","assets/screenshots/poppy2.jpg"],
+        "video": "assets/video/poppy_trailer.mp4"
       },
-      "versions":[
+      "versions": [
         {"ver":"1.0.25","url":"https://files.an1.co/poppy-playtime-chapter-3_1.0.25-an1.com.apk"}
+      ]
+    },
+    {
+      "id": "g2",
+      "name": "PUBG Mobile",
+      "package": "com.pubg.mobile",
+      "owner": "PUBG Corp",
+      "type": "game",
+      "category": "Battle Royale",
+      "description": "Experience the ultimate battle royale on your mobile device.",
+      "releaseDate": "2025-12-15",
+      "lastUpdate": "2025-12-20",
+      "uploadedDate": "2025-12-20",
+      "icon": "assets/icon/pubg.png",
+      "assets": {
+        "screenshots": ["assets/screenshots/pubg1.jpg","assets/screenshots/pubg2.jpg"],
+        "video": "assets/video/pubg_trailer.mp4"
+      },
+      "versions": [
+        {"ver":"3.0.0","url":"https://files.example.com/pubg.apk"},
+        {"ver":"2.9.5","url":"https://files.example.com/pubg_old.apk"}
+      ]
+    },
+    {
+      "id": "g3",
+      "name": "Granny Choo Choo",
+      "package": "com.granny.choo",
+      "owner": "Granny Studio",
+      "type": "game",
+      "category": "Horror",
+      "description": "Play the fan-made horror adventure with Granny and scary surprises.",
+      "releaseDate": "2025-11-01",
+      "lastUpdate": "2025-11-10",
+      "uploadedDate": "2025-11-10",
+      "icon": "FS",
+      "assets": {
+        "screenshots": ["assets/screenshots/granny1.jpg","assets/screenshots/granny2.jpg"],
+        "video": "assets/video/granny_trailer.mp4"
+      },
+      "versions": [
+        {"ver":"1.2","url":"https://files.example.com/granny.apk"}
+      ]
+    },
+    {
+      "id": "g4",
+      "name": "Hill Climb Racing MOD",
+      "package": "com.hillclimb.mod",
+      "owner": "Fingersoft",
+      "type": "game",
+      "category": "Simulation",
+      "description": "Drive cars and bikes in crazy hills with mods enabled.",
+      "releaseDate": "2024-05-10",
+      "lastUpdate": "2025-01-01",
+      "uploadedDate": "2025-01-01",
+      "icon": "%%FS",
+      "assets": {
+        "screenshots": ["assets/screenshots/hill1.jpg","assets/screenshots/hill2.jpg"]
+      },
+      "versions": [
+        {"ver":"1.50","url":"https://files.example.com/hillclimb.apk"}
+      ]
+    },
+    {
+      "id": "g5",
+      "name": "Granny 2 MOD",
+      "package": "com.granny2.mod",
+      "owner": "Granny Studio",
+      "type": "game",
+      "category": "Horror",
+      "description": "Second chapter of Granny mod fan-made.",
+      "releaseDate": "2025-02-20",
+      "lastUpdate": "2025-06-10",
+      "uploadedDate": "2025-06-10",
+      "icon": "assets/icon/granny2.png",
+      "assets": {
+        "screenshots": ["assets/screenshots/granny2-1.jpg","assets/screenshots/granny2-2.jpg"]
+      },
+      "versions": [
+        {"ver":"2.0","url":"https://files.example.com/granny2.apk"},
+        {"ver":"1.9","url":"https://files.example.com/granny2_old.apk"}
+      ]
+    },
+    {
+      "id": "g6",
+      "name": "Pou MOD Unlimited Coin",
+      "package": "com.pou.mod",
+      "owner": "Pou Studio",
+      "type": "game",
+      "category": "Simulation",
+      "description": "Unlimited coins and fun mini-games in Pou.",
+      "releaseDate": "2024-10-01",
+      "lastUpdate": "2025-01-15",
+      "uploadedDate": "2025-01-15",
+      "icon": "FS",
+      "assets": {
+        "screenshots": ["assets/screenshots/pou1.jpg","assets/screenshots/pou2.jpg"]
+      },
+      "versions": [
+        {"ver":"3.5","url":"https://files.example.com/pou.apk"}
+      ]
+    },
+    {
+      "id": "g7",
+      "name": "Minecraft Mod Menu",
+      "package": "com.minecraft.mod",
+      "owner": "Mojang",
+      "type": "game",
+      "category": "Simulation",
+      "description": "Infinite worlds and unlimited resources with god mode menu enabled.",
+      "releaseDate": "2025-12-29",
+      "lastUpdate": "2025-12-29",
+      "uploadedDate": "2025-12-29",
+      "icon": "%%FS",
+      "assets": {
+        "screenshots": ["assets/screenshots/mc1.jpg","assets/screenshots/mc2.jpg"]
+      },
+      "versions": [
+        {"ver":"1.26.0.25","url":"https://example.com/mc_latest.apk"},
+        {"ver":"1.20.0.01","url":"https://example.com/mc_old.apk"}
+      ]
+    },
+    {
+      "id": "g8",
+      "name": "GTA 5 Online",
+      "package": "com.rockstar.gta5",
+      "owner": "Rockstar Games",
+      "type": "game",
+      "category": "Action",
+      "description": "Play GTA 5 online mode on mobile with mods.",
+      "releaseDate": "2025-08-15",
+      "lastUpdate": "2025-12-01",
+      "uploadedDate": "2025-12-01",
+      "icon": "assets/icon/gta5.png",
+      "assets": {
+        "screenshots": ["assets/screenshots/gta1.jpg","assets/screenshots/gta2.jpg"]
+      },
+      "versions": [
+        {"ver":"5.0.1","url":"https://files.example.com/gta5.apk"}
+      ]
+    },
+    {
+      "id": "g9",
+      "name": "Granny 4 Original Fan Made",
+      "package": "com.granny4.original",
+      "owner": "Granny Studio",
+      "type": "game",
+      "category": "Horror",
+      "description": "The fourth chapter of Granny fan-made series.",
+      "releaseDate": "2025-03-05",
+      "lastUpdate": "2025-09-01",
+      "uploadedDate": "2025-09-01",
+      "icon": "%%FS",
+      "assets": {
+        "screenshots": ["assets/screenshots/granny4-1.jpg","assets/screenshots/granny4-2.jpg"]
+      },
+      "versions": [
+        {"ver":"4.0","url":"https://files.example.com/granny4.apk"}
+      ]
+    },
+    {
+      "id": "g10",
+      "name": "Granny 5 Original Fan Made",
+      "package": "com.granny5.original",
+      "owner": "Granny Studio",
+      "type": "game",
+      "category": "Horror",
+      "description": "The fifth chapter of Granny fan-made series.",
+      "releaseDate": "2025-05-01",
+      "lastUpdate": "2025-10-10",
+      "uploadedDate": "2025-10-10",
+      "icon": "FS",
+      "assets": {
+        "screenshots": ["assets/screenshots/granny5-1.jpg","assets/screenshots/granny5-2.jpg"]
+      },
+      "versions": [
+        {"ver":"5.0","url":"https://files.example.com/granny5.apk"}
       ]
     }
   ]
-}
+    }
