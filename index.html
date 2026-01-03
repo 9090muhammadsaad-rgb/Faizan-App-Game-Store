@@ -1,279 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faizan Store | Modern App Market</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        [x-cloak] { display: none !important; }
-        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .dark .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-    </style>
-</head>
-<body x-data="appStore()" :class="darkMode ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'" x-cloak>
-
-    <header class="sticky top-0 z-40 w-full px-4 py-3 border-b flex items-center justify-between gap-4" :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'">
-        <div class="flex items-center font-bold text-xl tracking-tight text-blue-600" @click="resetFilters()">Faizan Store</div>
-        <div class="flex-1 max-w-md relative">
-            <input type="text" x-model="searchQuery" placeholder="Search apps..." class="w-full pl-10 pr-4 py-2 rounded-full border focus:outline-none focus:ring-2 focus:ring-blue-500 transition" :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-100 border-transparent'">
-            <span class="absolute left-3 top-2.5 opacity-50">🔍</span>
-        </div>
-        <button @click="showSettings = true" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">⚙️</button>
-    </header>
-
-    <main x-show="!viewingDetail" class="pb-20">
-        
-        <div class="flex gap-2 p-4 overflow-x-auto no-scrollbar">
-            <template x-for="type in ['All', 'Game', 'App']">
-                <button @click="filterType = type.toLowerCase()" 
-                        :class="filterType === type.toLowerCase() ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800' : 'bg-white')"
-                        class="px-6 py-2 rounded-full shadow-sm font-semibold transition whitespace-nowrap"
-                        x-text="type"></button>
-            </template>
-        </div>
-
-        <section class="mb-8">
-            <h2 class="px-4 text-xl font-bold mb-3 flex items-center">🔥 Trending</h2>
-            <div class="flex gap-4 overflow-x-auto px-4 no-scrollbar">
-                <template x-for="app in filteredApps.filter(a => trendingIds.includes(a.id))">
-                    <div @click="openDetail(app)" class="min-w-[140px] cursor-pointer group">
-                        <img :src="getIcon(app.icon)" class="w-28 h-28 rounded-3xl mb-2 group-hover:scale-105 transition duration-300 card-shadow">
-                        <div class="text-sm font-semibold truncate" x-text="app.name"></div>
-                        <div class="text-xs opacity-60" x-text="app.category"></div>
-                    </div>
-                </template>
-            </div>
-        </section>
-
-        <section class="mb-8" x-show="randomCategory">
-            <h2 class="px-4 text-xl font-bold mb-3 flex items-center">✨ Featured: <span class="ml-2 text-blue-500" x-text="randomCategory"></span></h2>
-            <div class="flex gap-4 overflow-x-auto px-4 no-scrollbar">
-                <template x-for="app in apps.filter(a => a.category === randomCategory)">
-                    <div @click="openDetail(app)" class="min-w-[140px] cursor-pointer group">
-                        <img :src="getIcon(app.icon)" class="w-24 h-24 rounded-2xl mb-2 group-hover:scale-105 transition duration-300 shadow">
-                        <div class="text-xs font-semibold truncate" x-text="app.name"></div>
-                    </div>
-                </template>
-            </div>
-        </section>
-
-        <section class="px-4">
-            <h2 class="text-xl font-bold mb-4">Discover</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <template x-for="app in filteredApps" :key="app.id">
-                    <div @click="openDetail(app)" class="p-3 rounded-2xl transition-all duration-300 active:scale-95 cursor-pointer flex flex-col items-center text-center" :class="darkMode ? 'bg-gray-800' : 'bg-white card-shadow'">
-                        <div class="relative">
-                            <img :src="getIcon(app.icon)" class="w-20 h-20 rounded-2xl mb-2">
-                            <template x-if="trendingIds.includes(app.id)">
-                                <span class="absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-2 py-0.5 rounded-full uppercase font-bold">Hot</span>
-                            </template>
-                        </div>
-                        <div class="text-sm font-bold truncate w-full" x-text="app.name"></div>
-                        <div class="text-[10px] uppercase tracking-wider opacity-50 mb-1" x-text="app.category"></div>
-                        <div class="text-[10px] text-blue-500 font-medium" x-text="app.owner"></div>
-                    </div>
-                </template>
-            </div>
-        </section>
-    </main>
-
-    <main x-show="viewingDetail" class="fixed inset-0 z-50 overflow-y-auto" :class="darkMode ? 'bg-gray-900' : 'bg-white'">
-        <template x-if="selectedApp">
-            <div class="pb-10">
-                <div class="p-4 flex items-center justify-between sticky top-0 bg-inherit z-10">
-                    <button @click="viewingDetail = false" class="text-2xl">←</button>
-                    <div class="font-bold truncate px-4" x-text="selectedApp.name"></div>
-                    <div class="w-8"></div>
-                </div>
-
-                <div class="p-4 flex gap-4">
-                    <img :src="getIcon(selectedApp.icon)" class="w-24 h-24 rounded-3xl card-shadow">
-                    <div class="flex flex-col justify-center">
-                        <h1 class="text-2xl font-bold" x-text="selectedApp.name"></h1>
-                        <button @click="setOwnerFilter(selectedApp.owner)" class="text-blue-500 text-sm font-semibold text-left" x-text="selectedApp.owner"></button>
-                        <div class="text-xs opacity-50" x-text="selectedApp.package || 'N/A'"></div>
-                    </div>
-                </div>
-
-                <div class="px-4 py-2 flex gap-4 overflow-x-auto no-scrollbar">
-                    <div class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg font-bold">Install</div>
-                    <button @click="setCategoryFilter(selectedApp.category)" class="px-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm" x-text="selectedApp.category"></button>
-                </div>
-
-                <div class="grid grid-cols-3 gap-2 p-4 border-y my-4" :class="darkMode ? 'border-gray-800' : 'border-gray-100'">
-                    <div class="text-center"><div class="text-xs opacity-50">Released</div><div class="text-sm font-bold" x-text="selectedApp.releaseDate"></div></div>
-                    <div class="text-center"><div class="text-xs opacity-50">Updated</div><div class="text-sm font-bold" x-text="selectedApp.lastUpdate"></div></div>
-                    <div class="text-center"><div class="text-xs opacity-50">Versions</div><div class="text-sm font-bold" x-text="selectedApp.versions.length"></div></div>
-                </div>
-
-                <div class="flex gap-3 overflow-x-auto px-4 mb-6 no-scrollbar">
-                    <template x-for="ss in selectedApp.assets.screenshots">
-                        <img :src="ss" class="h-64 rounded-xl shadow-sm">
-                    </template>
-                </div>
-
-                <div class="px-4 mb-6">
-                    <h3 class="font-bold mb-2">About this game</h3>
-                    <p class="text-sm opacity-80 leading-relaxed" x-text="selectedApp.description"></p>
-                </div>
-
-                <div class="px-4 mb-6">
-                    <h3 class="font-bold mb-3">Versions</h3>
-                    <div class="space-y-2">
-                        <template x-for="v in selectedApp.versions">
-                            <div class="flex items-center justify-between p-3 rounded-xl" :class="darkMode ? 'bg-gray-800' : 'bg-gray-100'">
-                                <span class="font-mono font-bold" x-text="'v' + v.ver"></span>
-                                <a :href="v.url" class="text-blue-500 font-bold">Download</a>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <div class="px-4">
-                    <h3 class="font-bold mb-3">Similar to this</h3>
-                    <div class="flex gap-4 overflow-x-auto no-scrollbar">
-                        <template x-for="rec in apps.filter(a => a.type === selectedApp.type && a.id !== selectedApp.id)">
-                            <div @click="openDetail(rec)" class="min-w-[100px] text-center">
-                                <img :src="getIcon(rec.icon)" class="w-16 h-16 rounded-xl mx-auto mb-1">
-                                <div class="text-[10px] font-bold truncate" x-text="rec.name"></div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-        </template>
-    </main>
-
-    <div x-show="showSettings" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4 bg-black bg-opacity-50">
-        <div @click.away="showSettings = false" class="w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-6 transition-all" :class="darkMode ? 'bg-gray-800' : 'bg-white'">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">Settings</h2>
-                <button @click="showSettings = false" class="text-xl">×</button>
-            </div>
-
-            <div class="space-y-6">
-                <div class="flex items-center justify-between">
-                    <span>Dark Mode</span>
-                    <button @click="darkMode = !darkMode" class="w-12 h-6 rounded-full relative transition" :class="darkMode ? 'bg-blue-600' : 'bg-gray-300'">
-                        <div class="absolute top-1 w-4 h-4 rounded-full bg-white transition-all" :class="darkMode ? 'right-1' : 'left-1'"></div>
-                    </button>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold mb-2">Release Date Range</label>
-                    <div class="flex gap-2">
-                        <input type="date" x-model="dateStart" class="flex-1 text-xs p-2 rounded border dark:bg-gray-700 dark:border-gray-600">
-                        <input type="date" x-model="dateEnd" class="flex-1 text-xs p-2 rounded border dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold mb-2">Sort By</label>
-                    <select x-model="sortBy" class="w-full p-2 rounded border dark:bg-gray-700 dark:border-gray-600">
-                        <option value="default">Default</option>
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                    </select>
-                </div>
-            </div>
-            
-            <button @click="showSettings = false" class="w-full mt-8 py-3 bg-blue-600 text-white rounded-xl font-bold">Apply & Close</button>
-        </div>
-    </div>
-
-    <script>
-        function appStore() {
-            return {
-                apps: [],
-                trendingIds: [],
-                searchQuery: '',
-                filterType: 'all',
-                filterOwner: '',
-                filterCategory: '',
-                randomCategory: '',
-                darkMode: false,
-                showSettings: false,
-                viewingDetail: false,
-                selectedApp: null,
-                sortBy: 'default',
-                dateStart: '',
-                dateEnd: '',
-
-                async init() {
-                    try {
-                        const response = await fetch('info.json');
-                        const data = await response.json();
-                        this.apps = data.apps;
-                        this.trendingIds = data.trending_ids;
-                        
-                        // Select a random category for featured section
-                        const categories = [...new Set(this.apps.map(a => a.category))];
-                        this.randomCategory = categories[Math.floor(Math.random() * categories.length)];
-                    } catch (e) {
-                        console.error("Error loading JSON", e);
-                    }
-                },
-
-                get filteredApps() {
-                    return this.apps
-                        .filter(app => {
-                            const matchesSearch = app.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-                            const matchesType = this.filterType === 'all' || app.type === this.filterType;
-                            const matchesOwner = !this.filterOwner || app.owner === this.filterOwner;
-                            const matchesCategory = !this.filterCategory || app.category === this.filterCategory;
-                            
-                            // Date Range Filter
-                            let matchesDate = true;
-                            if (this.dateStart) matchesDate = matchesDate && (new Date(app.releaseDate) >= new Date(this.dateStart));
-                            if (this.dateEnd) matchesDate = matchesDate && (new Date(app.releaseDate) <= new Date(this.dateEnd));
-
-                            return matchesSearch && matchesType && matchesOwner && matchesCategory && matchesDate;
-                        })
-                        .sort((a, b) => {
-                            if (this.sortBy === 'newest') return new Date(b.releaseDate) - new Date(a.releaseDate);
-                            if (this.sortBy === 'oldest') return new Date(a.releaseDate) - new Date(b.releaseDate);
-                            return 0;
-                        });
-                },
-
-                getIcon(path) {
-                    if (!path || path === 'FS' || path === '%%FS') {
-                        return `https://via.placeholder.com/150/3b82f6/ffffff?text=Faizan+Store`;
-                    }
-                    return path;
-                },
-
-                openDetail(app) {
-                    this.selectedApp = app;
-                    this.viewingDetail = true;
-                    window.scrollTo(0, 0);
-                },
-
-                setOwnerFilter(owner) {
-                    this.filterOwner = owner;
-                    this.viewingDetail = false;
-                },
-
-                setCategoryFilter(cat) {
-                    this.filterCategory = cat;
-                    this.viewingDetail = false;
-                },
-
-                resetFilters() {
-                    this.filterType = 'all';
-                    this.filterOwner = '';
-                    this.filterCategory = '';
-                    this.searchQuery = '';
-                    this.viewingDetail = false;
-                }
-            }
-        }
-    </script>
-</body>
-                          </html>
-  
+{
+  "trending_ids": ["g1", "a1"],
+  "apps": [
+    {
+      "id": "g1",
+      "name": "Cyber Racer X",
+      "package": "com.faizan.cyberracer",
+      "owner": "Faizan Games",
+      "size": "1.2 GB",
+      "keywords": ["fast", "car", "neon", "racing"],
+      "type": "game",
+      "category": "Racing",
+      "description": "High-speed racing in a neon world...",
+      "releaseDate": "2024-01-15",
+      "lastUpdate": "2025-11-20",
+      "icon": "%%FS",
+      "assets": { "screenshots": ["https://picsum.photos/seed/g1/400/700"], "video": "" },
+      "versions": [{"ver": "1.2.0", "url": "#"}]
+    },
+    {
+      "id": "a1",
+      "name": "QuickEdit Pro",
+      "package": "com.faizan.editor",
+      "owner": "Faizan Apps",
+      "size": "85 MB",
+      "keywords": ["photo", "video", "filter", "editor"],
+      "type": "app",
+      "category": "Productivity",
+      "description": "Professional editing tools...",
+      "releaseDate": "2023-05-10",
+      "lastUpdate": "2025-12-01",
+      "icon": "https://picsum.photos/seed/a1/128",
+      "assets": { "screenshots": ["https://picsum.photos/seed/a1s1/400/700"], "video": "" },
+      "versions": [{"ver": "2.4.5", "url": "#"}]
+    }
+  ]
+}
