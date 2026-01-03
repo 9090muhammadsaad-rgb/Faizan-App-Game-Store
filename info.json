@@ -1,0 +1,30 @@
+{
+  "trending_ids": ["g1","g3"],
+
+  "apps": [
+    {
+      "id": "g1",
+      "name": "Poppy Playtime Chapter 3",
+      "package": "com.mobentertainment.poppy3",
+      "category": "Horror",
+      "icon": "assets/icon/poppy.png",
+      "description": "Survive the horror inside Playcare.",
+      "releaseDate": "2025-01-02",
+
+      "assets": {
+        "screenshots": [
+          "assets/screenshots/poppy1.jpg",
+          "assets/screenshots/poppy2.jpg"
+        ],
+        "video": "assets/video/poppy_trailer.mp4"
+      },
+
+      "versions": [
+        {
+          "ver": "1.0.25",
+          "url": "https://files.an1.co/poppy-playtime-chapter-3_1.0.25-an1.com.apk"
+        }
+      ]
+    }
+  ]
+}
