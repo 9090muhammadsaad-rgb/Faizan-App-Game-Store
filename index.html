@@ -5,82 +5,269 @@
 <title>Game Store</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{margin:0;font-family:sans-serif;background:#0f0f0f;color:#fff}
-header{padding:15px;background:#121212;font-size:20px;font-weight:bold}
+/* --- BASIC RESET --- */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#0b0b0b;color:#eee}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;background:#121212;position:sticky;top:0;z-index:100}
+header input[type=search]{flex:1;padding:8px;margin-right:10px;border-radius:6px;border:none;background:#222;color:#fff}
+header button{padding:8px 12px;border:none;border-radius:6px;background:#00ff99;color:#000;font-weight:bold;cursor:pointer}
+
+/* --- GRID LAYOUT --- */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:12px}
-.card{background:#1b1b1b;border-radius:12px;padding:10px;position:relative}
-.card img{width:100%;border-radius:10px}
-.title{font-size:15px;margin:6px 0}
-.cat{font-size:12px;color:#aaa}
-.trending{position:absolute;top:8px;left:8px;
-background:#ff9800;color:#000;font-size:11px;
-padding:3px 6px;border-radius:6px;font-weight:bold}
-.details{padding:15px}
-button{width:100%;padding:10px;border:0;
-border-radius:8px;background:#00ff99;font-weight:bold}
-.screens{display:flex;overflow-x:auto;gap:8px}
-.screens img{height:120px;border-radius:8px}
+
+/* --- CARD STYLE --- */
+.card{background:#1b1b1b;border-radius:12px;padding:10px;position:relative;cursor:pointer}
+.card img{width:100%;height:120px;object-fit:cover;border-radius:8px}
+.card .title{font-size:15px;margin:6px 0;font-weight:bold}
+.card .cat{font-size:12px;color:#aaa}
+.card .owner{font-size:11px;color:#0f9;cursor:pointer}
+.trending{position:absolute;top:8px;left:8px;background:#ff9800;color:#000;font-size:11px;padding:3px 6px;border-radius:6px;font-weight:bold}
+
+/* --- DETAILS PAGE --- */
+#details{display:none;padding:12px}
+#details img.icon{width:80px;height:80px;border-radius:12px;object-fit:cover}
+#details h2{margin:10px 0}
+#details .back{padding:6px 12px;background:#00ff99;color:#000;border:none;border-radius:6px;margin-bottom:10px;cursor:pointer}
+#details .btn{padding:6px 10px;border:none;border-radius:6px;background:#222;color:#fff;margin:2px;cursor:pointer}
+#details .screens{display:flex;overflow-x:auto;gap:8px;margin:10px 0}
+#details .screens img{height:120px;border-radius:8px}
+
+/* --- RECOMMENDED --- */
+#recommended{margin-top:20px}
+#recommended .rec-card{background:#222;padding:8px;border-radius:8px;display:flex;align-items:center;gap:8px;margin:5px 0}
+#recommended .rec-card img{width:40px;height:40px;border-radius:6px;object-fit:cover}
 </style>
 </head>
 <body>
 
-<header>🎮 Game Store</header>
+<header>
+  <input type="search" id="search" placeholder="Search Games or Apps" oninput="filterList()">
+  <button onclick="toggleSettings()">⚙️</button>
+</header>
 
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:200;padding:20px;overflow:auto;">
+  <h3>⚙ Advanced Settings</h3>
+  <label>Start Date:</label>
+  <input type="date" id="startDate"><br>
+  <label>End Date:</label>
+  <input type="date" id="endDate"><br>
+  <label>Theme:</label>
+  <select id="themeSelect" onchange="changeTheme()">
+    <option value="dark">Dark Theme</option>
+    <option value="light">White Theme</option>
+  </select><br>
+  <label>Sort By:</label>
+  <select id="sortSelect" onchange="filterList()">
+    <option value="default">Default</option>
+    <option value="lowest">Lowest to Highest</option>
+    <option value="highest">Highest to Lowest</option>
+    <option value="oldest">Oldest to Newest</option>
+    <option value="newest">Newest to Oldest</option>
+  </select><br><br>
+  <button onclick="toggleSettings()">Close</button>
+</div>
+
+<!-- FILTER BUTTONS -->
+<div style="display:flex;justify-content:center;gap:10px;padding:10px;">
+  <button onclick="setType('all')">🏠 All</button>
+  <button onclick="setType('game')">🎮 Game</button>
+  <button onclick="setType('app')">❓ App</button>
+</div>
+
+<!-- TRENDING -->
+<h3 style="padding-left:12px;">🔥 Trending</h3>
+<div id="trending" class="grid"></div>
+
+<!-- RANDOM CATEGORY -->
+<h3 style="padding-left:12px;">🌀 Random Category</h3>
+<div id="randomCategory" class="grid"></div>
+
+<!-- MAIN LIST -->
 <div id="list" class="grid"></div>
 
-<div id="details" class="details"></div>
+<!-- DETAILS PAGE -->
+<div id="details">
+  <button class="back" onclick="backToList()">← Back</button>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img class="icon" id="detailIcon">
+    <div>
+      <h2 id="detailName"></h2>
+      <button class="btn" id="ownerBtn"></button>
+    </div>
+  </div>
+  <h3>About This App</h3>
+  <p><b>Game Name:</b> <span id="detailGName"></span></p>
+  <p><b>Package:</b> <span id="detailPackage"></span></p>
+  <p><b>Release:</b> <span id="detailRelease"></span></p>
+  <p><b>Last Update:</b> <span id="detailUpdate"></span></p>
+  <p><b>Version:</b> <span id="detailVersion"></span></p>
+  <p><b>Type:</b> <span id="detailType"></span></p>
+  <p><b>Category:</b> <button class="btn" id="detailCategory"></button></p>
+  <p id="detailDesc"></p>
+
+  <h3>Screenshots & Video</h3>
+  <div id="detailMedia" class="screens"></div>
+
+  <h3>Recommended</h3>
+  <div id="recommended"></div>
+</div>
 
 <script>
-let DATA;
+let DATA = {};
+let currentType = 'all';
 
-fetch("info.json")
+fetch('info.json')
 .then(r=>r.json())
 .then(j=>{
   DATA=j;
-  showList();
+  populateTrending();
+  populateRandomCategory();
+  filterList();
 });
 
-function showList(){
-  const list=document.getElementById("list");
-  list.innerHTML="";
-  DATA.apps.forEach(g=>{
-    const div=document.createElement("div");
-    div.className="card";
-    div.onclick=()=>showDetails(g);
+function toggleSettings(){
+  const m = document.getElementById('settingsModal');
+  m.style.display = m.style.display==='none'?'block':'none';
+}
 
-    div.innerHTML=`
-      ${DATA.trending_ids.includes(g.id)?'<div class="trending">TRENDING</div>':''}
-      <img src="${g.icon}">
-      <div class="title">${g.name}</div>
-      <div class="cat">${g.category}</div>
-    `;
-    list.appendChild(div);
+function changeTheme(){
+  const theme = document.getElementById('themeSelect').value;
+  document.body.style.background = theme==='dark'?'#0b0b0b':'#fff';
+  document.body.style.color = theme==='dark'?'#eee':'#000';
+}
+
+function setType(t){ currentType=t; filterList(); }
+
+function populateTrending(){
+  const div = document.getElementById('trending');
+  div.innerHTML = '';
+  DATA.apps.forEach(g=>{
+    if(DATA.trending_ids.includes(g.id)){
+      const card = createCard(g);
+      div.appendChild(card);
+    }
   });
 }
 
-function showDetails(g){
-  document.getElementById("details").innerHTML=`
-    <h2>${g.name}</h2>
-    <p>${g.description}</p>
+function populateRandomCategory(){
+  const div = document.getElementById('randomCategory');
+  div.innerHTML='';
+  const cats = [...new Set(DATA.apps.map(a=>a.category).filter(c=>c))];
+  const randomCat = cats[Math.floor(Math.random()*cats.length)];
+  DATA.apps.filter(a=>a.category===randomCat).forEach(g=>{
+    div.appendChild(createCard(g));
+  });
+}
 
-    ${g.assets?.video?`
-      <video controls width="100%" src="${g.assets.video}"></video>
-    `:""}
+function filterList(){
+  const list = document.getElementById('list');
+  list.innerHTML='';
+  let apps = DATA.apps.filter(a=>{
+    return (currentType==='all'||a.type===currentType);
+  });
 
-    <h3>Screenshots</h3>
-    <div class="screens">
-      ${(g.assets?.screenshots||[]).map(s=>`<img src="${s}">`).join("")}
-    </div>
+  // Search
+  const search = document.getElementById('search').value.toLowerCase();
+  if(search) apps = apps.filter(a=>a.name.toLowerCase().includes(search));
 
-    <h3>Versions</h3>
-    ${g.versions.map(v=>`
-      <button onclick="location.href='${v.url}'">
-        Download v${v.ver}
-      </button>
-    `).join("<br><br>")}
+  // Sorting
+  const sort = document.getElementById('sortSelect')?.value;
+  if(sort==='oldest') apps.sort((a,b)=>new Date(a.releaseDate)-new Date(b.releaseDate));
+  else if(sort==='newest') apps.sort((a,b)=>new Date(b.releaseDate)-new Date(a.releaseDate));
+
+  apps.forEach(g=>list.appendChild(createCard(g)));
+}
+
+function createCard(g){
+  const div = document.createElement('div');
+  div.className='card';
+  div.onclick=()=>showDetails(g);
+  div.innerHTML=`
+    ${DATA.trending_ids.includes(g.id)?'<div class="trending">TRENDING</div>':''}
+    <img src="${g.icon||'https://via.placeholder.com/120x120?text=N/A'}">
+    <div class="title">${g.name||'N/A'}</div>
+    <div class="cat">${g.category||'N/A'}</div>
+    <div class="owner">${g.owner||'N/A'}</div>
   `;
+  return div;
+}
+
+function showDetails(g){
+  document.getElementById('details').style.display='block';
+  document.getElementById('list').style.display='none';
+  document.getElementById('trending').style.display='none';
+  document.getElementById('randomCategory').style.display='none';
+
+  document.getElementById('detailIcon').src = g.icon||'https://via.placeholder.com/80x80?text=N/A';
+  document.getElementById('detailName').innerText = g.name||'N/A';
+  document.getElementById('ownerBtn').innerText = g.owner||'N/A';
+  document.getElementById('ownerBtn').onclick = ()=>filterByOwner(g.owner);
+
+  document.getElementById('detailGName').innerText = g.name||'N/A';
+  document.getElementById('detailPackage').innerText = g.package||'N/A';
+  document.getElementById('detailRelease').innerText = g.releaseDate||'N/A';
+  document.getElementById('detailUpdate').innerText = g.lastUpdate||'N/A';
+  document.getElementById('detailVersion').innerText = g.versions?.length||1;
+  document.getElementById('detailType').innerText = g.type||'N/A';
+  const catBtn = document.getElementById('detailCategory');
+  catBtn.innerText = g.category||'N/A';
+  catBtn.onclick = ()=>filterByCategory(g.category);
+
+  // Description with read more
+  const descEl = document.getElementById('detailDesc');
+  if(g.description && g.description.length>250){
+    descEl.innerHTML = g.description.slice(0,250)+'... <span style="color:#0f9;cursor:pointer" onclick="descEl.innerHTML=`'+g.description.replace(/"/g,'\\"')+'`">Read More</span>';
+  }else descEl.innerText = g.description||'N/A';
+
+  // Screenshots + video
+  const mediaDiv = document.getElementById('detailMedia');
+  mediaDiv.innerHTML='';
+  if(g.assets?.screenshots) g.assets.screenshots.forEach(s=>{
+    const img = document.createElement('img'); img.src=s; mediaDiv.appendChild(img);
+  });
+  if(g.assets?.video){
+    const video = document.createElement('video');
+    video.src = g.assets.video; video.controls=true; video.style.height='120px'; video.style.marginLeft='8px';
+    mediaDiv.appendChild(video);
+  }
+
+  // Recommended (other apps same type)
+  const recDiv = document.getElementById('recommended');
+  recDiv.innerHTML='';
+  DATA.apps.filter(a=>a.id!==g.id && a.type===g.type).forEach(r=>{
+    const rec = document.createElement('div');
+    rec.className='rec-card';
+    rec.innerHTML=`<img src="${r.icon||'https://via.placeholder.com/40x40?text=N/A'}">
+    <div>
+      <b>${r.name||'N/A'}</b><br>
+      <small>${r.category||'N/A'}</small>
+    </div>`;
+    recDiv.appendChild(rec);
+  });
+}
+
+function backToList(){
+  document.getElementById('details').style.display='none';
+  document.getElementById('list').style.display='grid';
+  document.getElementById('trending').style.display='grid';
+  document.getElementById('randomCategory').style.display='grid';
+}
+
+function filterByOwner(owner){
+  currentType='all';
+  const list = document.getElementById('list');
+  list.innerHTML='';
+  DATA.apps.filter(a=>a.owner===owner).forEach(a=>list.appendChild(createCard(a)));
+}
+
+function filterByCategory(cat){
+  currentType='all';
+  const list = document.getElementById('list');
+  list.innerHTML='';
+  DATA.apps.filter(a=>a.category===cat).forEach(a=>list.appendChild(createCard(a)));
 }
 </script>
 
 </body>
-</html>
+  </html>
