@@ -3,210 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Admin | Media & Content Editor</title>
+    <title>Store Admin Pro | SDK & Media</title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p-green: #01875f; --p-bg: #ffffff; --p-txt: #202124; --p-border: #e8eaed; --p-surface: #f1f3f4; --p-active: #e6f4ea; }
-        [data-theme="dark"] { --p-bg: #121212; --p-txt: #e8eaed; --p-border: #333; --p-surface: #2d2d2d; --p-active: #1a332a; }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Google Sans', sans-serif; }
-        body { background: var(--p-bg); color: var(--p-txt); padding-bottom: 120px; }
-
+        :root { --p-green: #01875f; --p-bg: #ffffff; --p-txt: #202124; --p-border: #e8eaed; --p-surface: #f1f3f4; }
+        body { background: var(--p-bg); color: var(--p-txt); font-family: 'Google Sans', sans-serif; padding-bottom: 120px; }
         header { position: fixed; top: 0; width: 100%; background: var(--p-bg); z-index: 1000; padding: 12px 16px; border-bottom: 1px solid var(--p-border); display: flex; align-items: center; gap: 10px; }
-        .search-pill { flex: 1; display: flex; align-items: center; background: var(--p-surface); border-radius: 8px; padding: 0 12px; }
-        .search-input { width: 100%; border: none; background: transparent; padding: 12px; font-size: 15px; outline: none; color: var(--p-txt); }
-        .add-btn { background: var(--p-green); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-
         .container { padding: 80px 16px 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .app-card { background: var(--p-surface); border-radius: 20px; padding: 10px; text-align: center; border: 1px solid var(--p-border); transition: 0.3s; }
-        .app-card img { width: 100%; aspect-ratio: 1/1; border-radius: 18px; object-fit: cover; margin-bottom: 8px; }
+        .app-card { background: var(--p-surface); border-radius: 20px; padding: 10px; text-align: center; border: 1px solid var(--p-border); }
+        .app-card img { width: 100%; aspect-ratio: 1/1; border-radius: 18px; object-fit: cover; }
         
-        .card-actions { display: flex; gap: 5px; margin-top: 10px; }
-        .btn-sm { flex: 1; padding: 8px; border-radius: 6px; border: none; font-size: 12px; cursor: pointer; font-weight: bold; }
-        .edit-btn { background: #1a73e8; color: white; }
-        .del-btn { background: #d93025; color: white; }
-
-        /* EDITOR MODAL */
+        /* EDITOR */
         #editor-modal { position: fixed; inset: 0; background: var(--p-bg); z-index: 5000; display: none; overflow-y: auto; padding: 20px; }
-        .field { margin-bottom: 15px; }
-        .field label { display: block; font-size: 13px; color: var(--p-green); font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
-        .field input, .field textarea, .field select { width: 100%; padding: 14px; border: 1px solid var(--p-border); border-radius: 10px; background: var(--p-surface); color: var(--p-txt); outline: none; font-size: 14px; }
+        .section { background: var(--p-surface); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--p-border); }
+        .section-h { color: var(--p-green); font-weight: bold; font-size: 13px; margin-bottom: 10px; display: block; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
         
-        .section-title { background: var(--p-active); color: var(--p-green); padding: 10px; border-radius: 8px; margin: 20px 0 10px; font-weight: bold; font-size: 14px; }
-        .version-box { background: var(--p-surface); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--p-border); }
-
-        #output-panel { position: fixed; bottom: 0; width: 100%; background: var(--p-bg); padding: 20px; border-top: 2px solid var(--p-green); z-index: 4000; display: flex; gap: 10px; }
-        .main-save-btn { flex: 1; background: var(--p-green); color: white; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+        .field { margin-bottom: 12px; }
+        .field label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #555; }
+        .field input, .field select, .field textarea { width: 100%; padding: 10px; border: 1px solid var(--p-border); border-radius: 8px; outline: none; }
+        
+        .guide-box { background: #fffde7; border-left: 4px solid #fbc02d; padding: 10px; font-size: 12px; margin-top: 10px; border-radius: 4px; }
+        .btn-plus { background: var(--p-green); color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        
+        #output-panel { position: fixed; bottom: 0; width: 100%; background: #eee; padding: 15px; display: flex; gap: 10px; z-index: 4000; }
+        .save-btn { flex: 1; background: var(--p-green); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="search-pill">
-            <input type="text" id="search" class="search-input" placeholder="Search to edit/delete..." oninput="renderAdminGrid()">
-        </div>
-        <button class="add-btn" onclick="openEditor()">+</button>
+        <input type="text" id="search" placeholder="Search apps..." style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;" oninput="renderAdminGrid()">
+        <button onclick="openEditor()" style="background:var(--p-green); color:white; border:none; width:40px; height:40px; border-radius:50%; font-size:20px;">+</button>
     </header>
 
-    <div class="container">
-        <div class="grid" id="admin-grid"></div>
-    </div>
+    <div class="container"><div class="grid" id="admin-grid"></div></div>
 
     <div id="editor-modal">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 id="modal-title" style="color:var(--p-green);">Editor</h2>
-            <button onclick="closeEditor()" style="background:none; border:none; font-size:35px; color:var(--p-txt); cursor:pointer;">&times;</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h2 style="color:var(--p-green);">App Configuration</h2>
+            <button onclick="closeEditor()" style="font-size:30px; border:none; background:none; cursor:pointer;">&times;</button>
         </div>
 
         <input type="hidden" id="edit-index">
-        
-        <div class="section-title">Basic Information</div>
-        <div class="field"><label>App Icon Path</label><input type="text" id="f-icon" placeholder="icons/game-icon.jpeg"></div>
-        <div class="field"><label>App Name</label><input type="text" id="f-name"></div>
-        <div class="field"><label>Category</label><input type="text" id="f-cat" placeholder="Action, Tools, etc."></div>
-        <div class="field"><label>Type</label><select id="f-type"><option value="game">Game</option><option value="app">App</option></select></div>
-        <div class="field"><label>Description</label><textarea id="f-desc" rows="4"></textarea></div>
-        <div class="field"><label>Release Date</label><input type="date" id="f-date"></div>
 
-        <div class="section-title">Screenshots & Videos</div>
-        <div class="field">
-            <label>Media Paths (Separate with comma ,)</label>
-            <textarea id="f-media" rows="3" placeholder="assets/screen1.jpg, assets/screen2.png, assets/trailer.mp4"></textarea>
-            <small style="color:gray; font-size:11px;">Note: You can use .jpg, .png, .webp and .mp4 links.</small>
+        <div class="section">
+            <span class="section-h">IDENTITY & OWNER</span>
+            <div class="field"><label>Owner / Developer Name</label><input type="text" id="f-owner" placeholder="e.g. Faizan Mods"></div>
+            <div class="field"><label>Is this a MOD? (True/False)</label><select id="f-mod"><option value="true">True (MOD)</option><option value="false">False (Original)</option></select></div>
+            <div class="field"><label>App Name</label><input type="text" id="f-name"></div>
+            <div class="field">
+                <label>Icon Selection (Select .png/.jpg/.jpeg)</label>
+                <input type="file" id="icon-picker" accept="image/*" onchange="handleFile(this, 'f-icon', 'icons/')">
+                <input type="text" id="f-icon" readonly style="margin-top:5px; background:#f0f0f0;">
+                <div id="icon-warning" style="color:red; font-size:10px; display:none; margin-top:30px;">Error: .mp4 is not supported for icons!</div>
+            </div>
         </div>
 
-        <div class="section-title">Download Versions</div>
-        <div id="v-list"></div>
-        <button onclick="addVersionField()" style="width:100%; padding:10px; background:var(--p-active); color:var(--p-green); border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:5px;">+ Add New Version</button>
-
-        <div style="margin-top:40px;">
-            <button class="main-save-btn" style="width:100%; font-size:18px;" onclick="saveChanges()">SAVE CHANGES TO LIST</button>
+        <div class="section">
+            <span class="section-h">ANDROID SPECS</span>
+            <div style="display:flex; gap:10px;">
+                <div class="field" style="flex:1;"><label>Min SDK (e.g. 21)</label><input type="number" id="f-min-sdk" value="21"></div>
+                <div class="field" style="flex:1;"><label>Target SDK (e.g. 33)</label><input type="number" id="f-target-sdk" value="33"></div>
+            </div>
         </div>
+
+        <div class="section">
+            <span class="section-h">DATES (Auto-filled)</span>
+            <div class="field"><label>Release Date</label><input type="date" id="f-release"></div>
+            <div class="field"><label>Last Update</label><input type="date" id="f-last-update"></div>
+        </div>
+
+        <div class="section">
+            <span class="section-h">SCREENSHOTS / TRAILERS</span>
+            <div id="media-list"></div>
+            <input type="file" id="media-picker" multiple accept="image/*,video/mp4" onchange="handleMediaFiles(this)">
+            <div class="guide-box" id="media-guide">Guide: Files will be mapped to "assets/" folder.</div>
+        </div>
+
+        <div class="section">
+            <span class="section-h">VERSIONS</span>
+            <div id="v-list"></div>
+            <button class="btn-plus" onclick="addVersionField()">+ Add Version</button>
+        </div>
+
+        <button class="save-btn" style="width:100%; margin-top:20px;" onclick="saveChanges()">CONFIRM & GENERATE</button>
     </div>
 
     <div id="output-panel">
-        <button class="main-save-btn" style="background:#1a73e8;" onclick="copyJSON()">📋 Copy JSON</button>
-        <button class="main-save-btn" onclick="downloadJSON()">📥 Download info.json</button>
+        <button class="save-btn" onclick="copyJSON()">📋 Copy JSON</button>
+        <button class="save-btn" style="background:#1a73e8;" onclick="downloadJSON()">📥 Download info.json</button>
     </div>
 
     <script>
         let db = [];
+        let mediaArr = [];
 
         async function loadData() {
-            try {
-                const res = await fetch('info.json');
-                const data = await res.json();
-                db = data.apps;
-                renderAdminGrid();
-            } catch (e) { alert("Ready to start! (Add your first game)"); }
+            try { const res = await fetch('info.json'); const data = await res.json(); db = data.apps; renderAdminGrid(); } catch (e) {}
+        }
+
+        // AUTO-READ FILENAME
+        function handleFile(input, targetId, folder) {
+            const file = input.files[0];
+            const warning = document.getElementById('icon-warning');
+            if(file.type.includes('video')) {
+                warning.style.display = 'block';
+                input.value = "";
+                return;
+            }
+            warning.style.display = 'none';
+            document.getElementById(targetId).value = folder + file.name;
+        }
+
+        function handleMediaFiles(input) {
+            const list = document.getElementById('media-list');
+            Array.from(input.files).forEach(f => {
+                const path = "assets/" + f.name;
+                if(!mediaArr.includes(path)) {
+                    mediaArr.push(path);
+                    list.innerHTML += `<div style="font-size:11px; color:blue;">✓ Ready: ${path}</div>`;
+                }
+            });
         }
 
         function renderAdminGrid() {
-            const query = document.getElementById('search').value.toLowerCase();
-            const grid = document.getElementById('admin-grid');
-            const filtered = db.filter(a => a.name.toLowerCase().includes(query));
-
-            grid.innerHTML = filtered.map((a, index) => `
+            const q = document.getElementById('search').value.toLowerCase();
+            document.getElementById('admin-grid').innerHTML = db.filter(a => a.name.toLowerCase().includes(q)).map((a, i) => `
                 <div class="app-card">
-                    <img src="${a.icon}" onerror="this.src='https://via.placeholder.com/150'">
-                    <div style="font-size:13px; font-weight:700; height:35px; overflow:hidden;">${a.name}</div>
-                    <div class="card-actions">
-                        <button class="btn-sm edit-btn" onclick="openEditor(${index})">Edit</button>
-                        <button class="btn-sm del-btn" onclick="deleteItem(${index})">Del</button>
-                    </div>
+                    <img src="${a.icon}">
+                    <div style="font-size:12px; margin:5px 0;">${a.name}</div>
+                    <button class="btn-plus" onclick="openEditor(${i})">Edit</button>
                 </div>
             `).join('');
         }
 
-        function openEditor(index = -1) {
+        function openEditor(idx = -1) {
             document.getElementById('editor-modal').style.display = 'block';
-            document.getElementById('edit-index').value = index;
-            document.getElementById('v-list').innerHTML = '';
+            document.getElementById('edit-index').value = idx;
+            const today = new Date().toISOString().split('T')[0];
+            mediaArr = [];
+            document.getElementById('media-list').innerHTML = "";
+            document.getElementById('v-list').innerHTML = "";
 
-            if(index > -1) {
-                const a = db[index];
-                document.getElementById('f-icon').value = a.icon;
+            if(idx > -1) {
+                const a = db[idx];
                 document.getElementById('f-name').value = a.name;
-                document.getElementById('f-cat').value = a.category;
-                document.getElementById('f-desc').value = a.description;
-                document.getElementById('f-type').value = a.type;
-                document.getElementById('f-date').value = a.releaseDate;
-                document.getElementById('f-media').value = a.media ? a.media.join(', ') : "";
+                document.getElementById('f-owner').value = a.ownerName || "";
+                document.getElementById('f-mod').value = String(a.isMod || "false");
+                document.getElementById('f-icon').value = a.icon;
+                document.getElementById('f-min-sdk').value = a.minSdk || 21;
+                document.getElementById('f-target-sdk').value = a.targetSdk || 33;
+                document.getElementById('f-release').value = a.releaseDate;
+                document.getElementById('f-last-update').value = today;
+                mediaArr = a.media || [];
+                mediaArr.forEach(m => document.getElementById('media-list').innerHTML += `<div style="font-size:11px;">${m}</div>`);
                 a.versions.forEach(v => addVersionField(v.ver, v.size, v.url));
             } else {
-                document.getElementById('f-icon').value = "icons/";
-                document.getElementById('f-name').value = "";
-                document.getElementById('f-desc').value = "";
-                document.getElementById('f-media').value = "";
+                document.getElementById('f-release').value = today;
+                document.getElementById('f-last-update').value = today;
                 addVersionField();
             }
         }
 
-        function addVersionField(ver="", size="", url="") {
-            const div = document.createElement('div');
-            div.className = "version-box";
-            div.innerHTML = `
-                <input type="text" class="v-ver" placeholder="Version (e.g v1.0)" value="${ver}" style="width:40%; margin-bottom:8px;">
-                <input type="text" class="v-size" placeholder="Size (e.g 500 MB)" value="${size}" style="width:55%; margin-bottom:8px;">
-                <input type="text" class="v-url" placeholder="Direct Download Link" value="${url}" style="width:100%;">
-                <button onclick="this.parentElement.remove()" style="background:none; border:none; color:red; font-size:11px; margin-top:5px; cursor:pointer;">&times; Remove Version</button>
-            `;
-            document.getElementById('v-list').appendChild(div);
+        function addVersionField(v="", s="", u="") {
+            const d = document.createElement('div');
+            d.innerHTML = `<input type="text" class="v-ver" placeholder="Ver" value="${v}" style="width:30%"> <input type="text" class="v-size" placeholder="Size" value="${s}" style="width:30%"> <input type="text" class="v-url" placeholder="URL" value="${u}" style="width:30%">`;
+            document.getElementById('v-list').appendChild(d);
         }
 
         function saveChanges() {
-            const index = document.getElementById('edit-index').value;
-            const mediaStr = document.getElementById('f-media').value;
-            const mediaArr = mediaStr.split(',').map(s => s.trim()).filter(s => s !== "");
-
+            const idx = document.getElementById('edit-index').value;
             const vers = [];
-            document.querySelectorAll('.version-box').forEach(box => {
-                const v = box.querySelector('.v-ver').value;
-                if(v) vers.push({ 
-                    ver: v, 
-                    size: box.querySelector('.v-size').value, 
-                    url: box.querySelector('.v-url').value 
-                });
+            document.querySelectorAll('#v-list div').forEach(d => {
+                const ver = d.querySelector('.v-ver').value;
+                if(ver) vers.push({ ver: ver, size: d.querySelector('.v-size').value, url: d.querySelector('.v-url').value });
             });
 
-            const appData = {
-                id: index > -1 ? db[index].id : "id_" + Date.now(),
+            const obj = {
+                id: idx > -1 ? db[idx].id : "id_" + Date.now(),
                 name: document.getElementById('f-name').value,
+                ownerName: document.getElementById('f-owner').value,
+                isMod: document.getElementById('f-mod').value === "true",
                 icon: document.getElementById('f-icon').value,
-                type: document.getElementById('f-type').value,
-                category: document.getElementById('f-cat').value,
-                size: vers[0] ? vers[0].size : "N/A",
-                releaseDate: document.getElementById('f-date').value,
-                description: document.getElementById('f-desc').value,
+                minSdk: document.getElementById('f-min-sdk').value,
+                targetSdk: document.getElementById('f-target-sdk').value,
+                releaseDate: document.getElementById('f-release').value,
+                lastUpdate: document.getElementById('f-last-update').value,
+                media: mediaArr,
                 versions: vers,
-                media: mediaArr
+                size: vers[0] ? vers[0].size : "0MB"
             };
 
-            if(index > -1) db[index] = appData;
-            else db.push(appData);
-
-            closeEditor();
-            renderAdminGrid();
+            if(idx > -1) db[idx] = obj; else db.push(obj);
+            
+            // ALERT FOR USER
+            alert(`GUIDE:\n1. Icon ko "icons/" folder mein rakhein.\n2. Screenshots/Videos ko "assets/" folder mein rakhein.`);
+            
+            closeEditor(); renderAdminGrid();
         }
 
-        function deleteItem(index) { if(confirm("Delete this app?")) { db.splice(index, 1); renderAdminGrid(); } }
         function closeEditor() { document.getElementById('editor-modal').style.display = 'none'; }
-        
-        function copyJSON() {
-            const data = JSON.stringify({ apps: db }, null, 2);
-            navigator.clipboard.writeText(data);
-            alert("Code Copied! Now paste it in info.json");
+        function copyJSON() { navigator.clipboard.writeText(JSON.stringify({apps:db}, null, 2)); alert("Copied!"); }
+        function downloadJSON() { 
+            const blob = new Blob([JSON.stringify({apps:db}, null, 2)], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = "info.json"; a.click();
         }
-
-        function downloadJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ apps: db }, null, 2));
-            const dl = document.createElement('a');
-            dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", "info.json");
-            dl.click();
-        }
-
         loadData();
     </script>
 </body>
