@@ -3,266 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faizan Store Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <title>Faizan Store | Final Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        [x-cloak] { display: none !important; }
-        body { font-family: 'Outfit', sans-serif; transition: 0.3s ease; }
+        :root { --p-green: #01875f; --p-bg: #ffffff; --p-txt: #202124; --p-border: #e8eaed; --p-surface: #f1f3f4; --p-active: #e6f4ea; --p-drawer: #ffffff; }
+        [data-theme="dark"] { --p-bg: #121212; --p-txt: #e8eaed; --p-border: #333; --p-surface: #2d2d2d; --p-active: #1a332a; --p-drawer: #1e1e1e; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Google Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--p-bg); color: var(--p-txt); transition: 0.3s; overflow-x: hidden; }
+
+        header { position: fixed; top: 0; width: 100%; background: var(--p-bg); z-index: 1000; padding: 12px 16px; border-bottom: 1px solid var(--p-border); display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+        header.hide { transform: translateY(-100%); }
+        .search-pill { flex: 1; display: flex; align-items: center; background: var(--p-surface); border-radius: 8px; padding: 0 12px; }
+        .search-input { width: 100%; border: none; background: transparent; padding: 12px; font-size: 15px; outline: none; color: var(--p-txt); }
+
+        /* SETTINGS DRAWER */
+        #drawer { position: fixed; top: 0; right: -100%; width: 300px; height: 100%; background: var(--p-drawer); z-index: 6000; padding: 25px; transition: 0.4s; box-shadow: -10px 0 30px rgba(0,0,0,0.2); overflow-y: auto; }
+        #drawer.open { right: 0; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 5500; display: none; backdrop-filter: blur(2px); }
+        .overlay.active { display: block; }
+        .drawer-btn { width: 100%; padding: 14px 10px; text-align: left; border: none; background: transparent; border-bottom: 1px solid var(--p-border); color: var(--p-txt); font-size: 15px; cursor: pointer; }
+
+        /* GRID */
+        .container { padding: 80px 16px 120px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 18px; }
+        .app-card { cursor: pointer; text-align: left; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .app-card img { width: 100%; aspect-ratio: 1/1; border-radius: 22%; object-fit: cover; border: 1px solid var(--p-border); }
+        .app-name { font-size: 12px; font-weight: 500; margin-top: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* DETAIL LAYOUT */
+        #details { position: fixed; inset: 0; background: var(--p-bg); z-index: 5000; display: none; overflow-y: auto; }
+        .d-header { position: sticky; top: 0; background: var(--p-bg); padding: 15px; border-bottom: 1px solid var(--p-border); z-index: 10; display: flex; align-items: center; }
         
-        /* Theme Logic: Text color automatic change hoga */
-        .light-theme { background-color: #ffffff; color: #111827; }
-        .dark-theme { background-color: #05050a; color: #f3f4f6; }
+        .hero-section { padding: 20px; display: flex; align-items: center; gap: 20px; }
+        .hero-section img { width: 90px; height: 90px; border-radius: 22%; border: 1px solid var(--p-border); }
+        .hero-section h2 { font-size: 24px; font-weight: 700; }
+
+        .desc-section { padding: 0 20px 20px; font-size: 14px; color: #5f6368; line-height: 1.6; }
         
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .glass { backdrop-filter: blur(15px); background: rgba(128, 128, 128, 0.1); }
-        .card-bg { background: rgba(128, 128, 128, 0.05); border: 1px solid rgba(128, 128, 128, 0.1); }
+        /* GALLERY FOR ALL FORMATS */
+        .gallery { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
+        .gallery::-webkit-scrollbar { display: none; }
+        .gallery img, .gallery video { height: 180px; width: auto; min-width: 100px; border-radius: 12px; border: 1px solid var(--p-border); background: #eee; }
+
+        /* VERSION BIG BUTTONS */
+        .dl-section { padding: 0 20px 30px; }
+        .dl-card { background: var(--p-surface); padding: 20px; border-radius: 16px; margin-bottom: 15px; }
+        .dl-btn { display: block; width: 100%; background: var(--p-green); color: white; padding: 18px; border-radius: 12px; font-weight: 700; font-size: 18px; text-decoration: none; text-align: center; border: none; cursor: pointer; }
+        
+        .rec-section { padding: 20px; background: var(--p-surface); border-top: 1px solid var(--p-border); }
+
+        nav { position: fixed; bottom: 0; width: 100%; background: var(--p-bg); border-top: 1px solid var(--p-border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 4000; }
+        .nav-link { border: none; background: none; color: gray; font-size: 12px; font-weight: 500; flex: 1; cursor: pointer; }
+        .nav-link.active { color: var(--p-green); font-weight: 700; }
     </style>
 </head>
-<body x-data="storeEngine()" :class="darkMode ? 'dark-theme' : 'light-theme'" x-cloak>
+<body data-theme="light">
 
-    <header class="sticky top-0 z-[100] glass border-b border-gray-500/10 p-4 flex items-center gap-3">
-        <div @click="resetAll()" class="text-xl font-black text-blue-600 cursor-pointer">FAIZAN</div>
-        <div class="flex-1 relative">
-            <input type="text" x-model="searchQuery" 
-                   placeholder="Try 'allgame' or 'pub:Garena'..." 
-                   class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-500/10 border-none outline-none text-sm font-semibold text-inherit">
-            <span class="absolute left-3 top-2.5 opacity-40">🔍</span>
+    <header id="main-header">
+        <div class="search-pill">
+            <input type="text" id="search" class="search-input" placeholder="Search games...">
         </div>
-        <button @click="showSettings = true" class="p-2 bg-gray-500/10 rounded-xl">⚙️</button>
+        <div onclick="toggleDrawer(true)" style="cursor:pointer; font-size: 24px;">🔘</div>
     </header>
 
-    <main x-show="!viewingDetail" class="p-4 pb-20">
-        
-        <template x-if="shouldShowOffer() && getOffer()">
-            <div @click="openDetail(getOffer())" class="relative h-44 rounded-[2rem] overflow-hidden mb-6 shadow-xl cursor-pointer">
-                <video :src="getOffer().assets.video" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 p-4 flex flex-col justify-end">
-                    <h2 class="text-white text-lg font-black" x-text="getOffer().name"></h2>
-                    <p class="text-white/60 text-[9px] font-bold" x-text="getOffer().package"></p>
-                </div>
-            </div>
-        </template>
+    <div class="overlay" id="overlay" onclick="toggleDrawer(false)"></div>
 
-        <div class="grid-3">
-            <template x-for="app in filteredApps" :key="app.id">
-                <div @click="openDetail(app)" class="p-2 rounded-2xl text-center card-bg active:scale-95 transition-transform">
-                    <img :src="getIcon(app.icon)" class="w-16 h-16 rounded-[1.5rem] mx-auto mb-2 shadow-sm border border-gray-500/10">
-                    <p class="text-[10px] font-black truncate" x-text="app.name"></p>
-                    <p class="text-[8px] opacity-40 font-bold uppercase" x-text="app.category"></p>
-                </div>
-            </template>
-        </div>
-
-        <div x-show="filteredApps.length === 0" class="mt-20 text-center opacity-30 italic font-bold">No Data in this range.</div>
-    </main>
-
-    <div x-show="viewingDetail" class="fixed inset-0 z-[110] bg-inherit overflow-y-auto" x-transition>
-        <template x-if="selectedApp">
-            <div class="pb-24">
-                <div class="p-4 flex items-center gap-4 sticky top-0 bg-inherit z-20 border-b border-gray-500/10">
-                    <button @click="viewingDetail = false" class="text-2xl font-bold">←</button>
-                    <span class="font-bold text-sm" x-text="selectedApp.name"></span>
-                </div>
-
-                <div class="p-6 flex gap-5">
-                    <img :src="getIcon(selectedApp.icon)" class="w-24 h-24 rounded-[2rem] shadow-xl">
-                    <div class="flex-1 self-center">
-                        <h1 class="text-2xl font-black" x-text="selectedApp.name"></h1>
-                        <p @click="searchQuery = 'pub:'+selectedApp.owner; viewingDetail = false" 
-                           class="text-blue-500 font-bold text-sm cursor-pointer" x-text="selectedApp.owner"></p>
-                        <p class="text-[10px] opacity-40 font-mono" x-text="selectedApp.package"></p>
-                    </div>
-                </div>
-
-                <div class="px-6 mb-8">
-                    <template x-if="hasMedia(selectedApp)">
-                        <div class="flex gap-3 overflow-x-auto no-scrollbar">
-                            <template x-for="file in selectedApp.assets.screenshots">
-                                <div class="min-w-[240px] h-44 rounded-3xl overflow-hidden bg-black border border-gray-500/10">
-                                    <template x-if="isVideo(file)">
-                                        <video :src="file" controls class="w-full h-full object-cover"></video>
-                                    </template>
-                                    <template x-if="!isVideo(file)">
-                                        <img :src="file" class="w-full h-full object-cover">
-                                    </template>
-                                </div>
-                            </template>
-                        </div>
-                    </template>
-                    <template x-if="!hasMedia(selectedApp)">
-                        <div class="h-32 rounded-3xl border-2 border-dashed border-gray-500/20 flex items-center justify-center opacity-30 italic text-xs font-bold">No Media Available</div>
-                    </template>
-                </div>
-
-                <div class="px-6 grid gap-3 mb-8">
-                    <div class="flex justify-between text-[9px] font-black opacity-40 uppercase border-b border-gray-500/10 pb-2">
-                        <span>Launch: <span x-text="selectedApp.releaseDate"></span></span>
-                        <span>Update: <span x-text="selectedApp.lastUpdate"></span></span>
-                    </div>
-                    <template x-for="v in selectedApp.versions">
-                        <div class="p-4 card-bg rounded-[1.8rem] flex justify-between items-center">
-                            <div>
-                                <p class="font-black text-sm" x-text="'Version ' + v.ver"></p>
-                                <p class="text-[10px] text-blue-500 font-black uppercase" x-text="v.size"></p>
-                            </div>
-                            <a :href="v.url" class="px-8 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black shadow-lg shadow-blue-500/20">INSTALL</a>
-                        </div>
-                    </template>
-                </div>
-
-                <div class="px-6">
-                    <div class="p-5 bg-blue-500/5 rounded-[2rem] border-l-4 border-blue-600">
-                        <h3 class="text-xs font-black text-blue-600 mb-2 uppercase italic">About this game</h3>
-                        <p class="text-xs leading-relaxed font-semibold opacity-70" x-text="selectedApp.description"></p>
-                    </div>
-                </div>
-
-                <div class="px-6 mt-6 flex flex-wrap gap-2">
-                    <template x-for="kw in selectedApp.keywords">
-                        <span class="text-[9px] font-bold text-blue-500 bg-blue-500/10 px-3 py-1 rounded-full" x-text="'#'+kw"></span>
-                    </template>
-                </div>
-
-                <div class="px-6 mt-10" x-show="selectedApp.rec_ids && selectedApp.rec_ids.length > 0">
-                    <h3 class="font-black text-sm mb-4 uppercase opacity-50">Recommended</h3>
-                    <div class="flex gap-4 overflow-x-auto no-scrollbar">
-                        <template x-for="recId in selectedApp.rec_ids">
-                            <div @click="openDetail(getAppById(recId))" class="min-w-[90px] text-center">
-                                <img :src="getIcon(getAppById(recId).icon)" class="w-16 h-16 rounded-2xl mx-auto mb-1">
-                                <p class="text-[8px] font-bold truncate" x-text="getAppById(recId).name"></p>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-        </template>
+    <div id="drawer">
+        <div style="font-size: 20px; font-weight: 700; color: var(--p-green); margin-bottom: 20px;">Settings</div>
+        <button class="drawer-btn" onclick="window.location.href='https://example.com/help'">❓ Help & Support</button>
+        <button class="drawer-btn" onclick="sortData('size-h')">📈 Highest To Lowest Size</button>
+        <button class="drawer-btn" onclick="sortData('size-l')">📉 Lowest To Highest Size</button>
+        <button class="drawer-btn" onclick="sortData('date-n')">🆕 Newest To Oldest</button>
+        <button class="drawer-btn" onclick="sortData('date-o')">📅 Oldest To Newest</button>
+        <button class="drawer-btn" onclick="setTheme('dark')">🌙 Dark Mode</button>
+        <button class="drawer-btn" onclick="setTheme('light')">☀️ White Mode</button>
+        <button class="drawer-btn" onclick="sortData('default')" style="color:var(--p-green); font-weight:bold;">🔄 Default All</button>
+        <button onclick="toggleDrawer(false)" style="width:100%; padding:15px; background:var(--p-active); color:var(--p-green); border:none; border-radius:10px; margin-top:20px; font-weight:bold;">CLOSE</button>
     </div>
 
-    <div x-show="showSettings" class="fixed inset-0 z-[200] flex items-end justify-center bg-black/80 backdrop-blur-sm p-4" x-transition>
-        <div @click.away="showSettings = false" class="bg-inherit w-full max-w-md rounded-[3rem] p-8 border border-gray-500/20 shadow-2xl">
-            <h2 class="text-2xl font-black mb-8 italic">Market Filters</h2>
-            
-            <div class="space-y-6">
-                <div class="p-4 card-bg rounded-2xl">
-                    <label class="text-[10px] font-black opacity-40 block mb-3 uppercase tracking-widest">Calendar Date Range</label>
-                    <div class="flex gap-4 items-center">
-                        <input type="date" x-model="dateStart" class="bg-transparent text-[10px] font-bold flex-1 outline-none">
-                        <span class="opacity-20">to</span>
-                        <input type="date" x-model="dateEnd" class="bg-transparent text-[10px] font-bold flex-1 outline-none">
-                    </div>
-                </div>
+    <div class="container">
+        <div class="grid" id="main-grid"></div>
+    </div>
 
-                <div class="p-4 card-bg rounded-2xl">
-                    <label class="text-[10px] font-black opacity-40 block mb-2 uppercase tracking-widest">Sorting Options</label>
-                    <select x-model="sortBy" class="w-full bg-transparent font-black text-xs outline-none cursor-pointer">
-                        <option value="newest">Newest To Oldest</option>
-                        <option value="oldest">Oldest To Newest</option>
-                        <option value="size-desc">Highest Size To Lowest</option>
-                        <option value="size-asc">Lowest Size To Highest</option>
-                    </select>
-                </div>
-
-                <div @click="darkMode = !darkMode" class="p-5 card-bg rounded-2xl flex justify-between items-center cursor-pointer active:scale-95 transition-all">
-                    <div class="flex items-center gap-3">
-                        <span class="text-lg" x-text="darkMode ? '🌙' : '☀️'"></span>
-                        <span class="text-xs font-black uppercase tracking-widest" x-text="darkMode ? 'Dark Theme' : 'Light Theme'"></span>
-                    </div>
-                    <div class="w-10 h-5 bg-gray-500/20 rounded-full relative">
-                        <div class="absolute top-1 w-3 h-3 bg-blue-600 rounded-full transition-all" :class="darkMode ? 'right-1' : 'left-1'"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <button @click="showSettings = false" class="w-full mt-8 py-5 bg-blue-600 text-white rounded-[1.8rem] font-black uppercase tracking-widest text-[10px]">Save & Apply Filters</button>
+    <div id="details">
+        <div class="d-header">
+            <button onclick="closeDetails()" style="background:none; border:none; font-size:24px; color:var(--p-txt);">←</button>
+            <span id="d-nav-title" style="margin-left:20px; font-weight:700"></span>
+        </div>
+        <div id="d-hero"></div>
+        <div class="desc-section" id="d-desc"></div>
+        <div class="gallery" id="d-gallery"></div>
+        <div class="dl-section" id="d-versions"></div>
+        <div class="rec-section">
+            <h4 style="margin-bottom:15px;">RECOMMENDED</h4>
+            <div class="grid" id="d-recs" style="grid-template-columns: repeat(3, 1fr);"></div>
         </div>
     </div>
+
+    <nav>
+        <button class="nav-link active" onclick="tab('all', this)">Home</button>
+        <button class="nav-link" onclick="tab('game', this)">Games</button>
+        <button class="nav-link" onclick="tab('app', this)">Apps</button>
+    </nav>
 
     <script>
-        function storeEngine() {
-            return {
-                apps: [],
-                searchQuery: '',
-                darkMode: false, // Default: Light
-                viewingDetail: false,
-                selectedApp: null,
-                showSettings: false,
-                sortBy: 'newest',
-                dateStart: '',
-                dateEnd: '',
-                
-                async init() {
-                    const res = await fetch('info.json');
-                    const data = await res.json();
-                    this.apps = data.apps;
-                },
+        let db = [];
+        let currentList = [];
+        let lastScroll = 0;
 
-                isVideo(f) { return /\.(mp4|web4|webm)$/i.test(f); },
-                
-                getIcon(path) {
-                    if (!path || path === "N/A" || path === "null" || path.includes("FS")) {
-                        return `https://ui-avatars.com/api/?name=FS&background=0066FF&color=fff&size=512`;
-                    }
-                    return path;
-                },
-
-                hasMedia(app) {
-                    return app.assets && app.assets.screenshots && app.assets.screenshots.length > 0 && app.assets.screenshots[0] !== "N/A";
-                },
-
-                getAppById(id) { return this.apps.find(a => a.id === id) || { name: '...', icon: 'FS' }; },
-
-                shouldShowOffer() {
-                    const q = this.searchQuery.toLowerCase();
-                    return !['all', 'allgame', 'allapp'].includes(q);
-                },
-
-                getOffer() { return this.apps.find(a => a.assets && a.assets.video && a.assets.video !== "N/A"); },
-
-                get filteredApps() {
-                    let q = this.searchQuery.toLowerCase();
-                    let list = this.apps;
-
-                    // 1. Search Commands
-                    if (q === 'all') list = this.apps;
-                    else if (q === 'allgame') list = list.filter(a => a.type === 'game');
-                    else if (q === 'allapp') list = list.filter(a => a.type === 'app');
-                    else if (q.startsWith('pub:')) list = list.filter(a => a.owner.toLowerCase().includes(q.split(':')[1]));
-                    else if (q.startsWith('category:')) list = list.filter(a => a.category.toLowerCase().includes(q.split(':')[1]));
-                    else if (q.length > 0) {
-                        list = list.filter(a => a.name.toLowerCase().includes(q) || (a.keywords && a.keywords.some(k => k.toLowerCase().includes(q))));
-                    }
-
-                    // 2. Date Range Filter
-                    if (this.dateStart) list = list.filter(a => new Date(a.releaseDate) >= new Date(this.dateStart));
-                    if (this.dateEnd) list = list.filter(a => new Date(a.releaseDate) <= new Date(this.dateEnd));
-
-                    // 3. Smart Size Sorting (MB vs GB)
-                    list.sort((a, b) => {
-                        const parseSize = (app) => {
-                            const s = app.versions[0]?.size || "0 MB";
-                            const m = s.match(/(\d+(\.\d+)?)\s*(MB|GB)/i);
-                            if (!m) return 0;
-                            let v = parseFloat(m[1]);
-                            return m[3].toUpperCase() === 'GB' ? v * 1024 : v;
-                        };
-
-                        if (this.sortBy === 'size-desc') return parseSize(b) - parseSize(a);
-                        if (this.sortBy === 'size-asc') return parseSize(a) - parseSize(b);
-                        if (this.sortBy === 'newest') return new Date(b.releaseDate) - new Date(a.releaseDate);
-                        if (this.sortBy === 'oldest') return new Date(a.releaseDate) - new Date(b.releaseDate);
-                        return 0;
-                    });
-                    return list;
-                },
-
-                openDetail(app) { this.selectedApp = app; this.viewingDetail = true; window.scrollTo(0,0); },
-                resetAll() { this.searchQuery = ''; this.viewingDetail = false; this.dateStart = ''; this.dateEnd = ''; }
-            }
+        async function init() {
+            try {
+                const res = await fetch('info.json');
+                const data = await res.json();
+                db = data.apps;
+                currentList = [...db];
+                renderGrid(currentList);
+            } catch (e) { console.error("JSON Error: ", e); }
         }
+
+        function renderGrid(list) {
+            document.getElementById('main-grid').innerHTML = list.map(a => `
+                <div class="app-card" onclick="openDetails('${a.id}')">
+                    <img src="${a.icon}" onerror="this.src='https://via.placeholder.com/150'">
+                    <div class="app-name">${a.name}</div>
+                    <div style="font-size:10px; color:gray;">${a.size} • ${a.releaseDate}</div>
+                </div>
+            `).join('');
+        }
+
+        function openDetails(id) {
+            const a = db.find(x => x.id === id);
+            document.getElementById('d-nav-title').innerText = a.name;
+            document.getElementById('d-hero').innerHTML = `<div class="hero-section"><img src="${a.icon}"><h2>${a.name}</h2></div>`;
+            document.getElementById('d-desc').innerHTML = `(( ${a.description} ))`;
+            
+            const gal = document.getElementById('d-gallery');
+            if (a.media && a.media.length > 0) {
+                gal.innerHTML = a.media.map(m => {
+                    const ext = m.split('.').pop().toLowerCase();
+                    if (['mp4', 'webm'].includes(ext)) return `<video src="${m}" controls></video>`;
+                    return `<img src="${m}" onerror="this.style.display='none'">`;
+                }).join('');
+                gal.style.display = 'flex';
+            } else { gal.style.display = 'none'; }
+
+            document.getElementById('d-versions').innerHTML = (a.versions || []).map(v => `
+                <div class="dl-card">
+                    <div style="margin-bottom:10px;"><b>Version: ${v.ver}</b> | Size: ${v.size}</div>
+                    <a href="${v.url}" class="dl-btn">Download Now</a>
+                </div>`).join('');
+
+            const recs = db.filter(x => x.category === a.category && x.id !== a.id).slice(0, 3);
+            document.getElementById('d-recs').innerHTML = recs.map(r => `
+                <div class="app-card" onclick="openDetails('${r.id}')">
+                    <img src="${r.icon}">
+                    <div class="app-name" style="font-size:10px;">${r.name}</div>
+                </div>`).join('');
+
+            document.getElementById('details').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function sortData(type) {
+            let sorted = [...currentList];
+            if (type === 'size-h') sorted.sort((a,b) => parseSize(b.size) - parseSize(a.size));
+            if (type === 'size-l') sorted.sort((a,b) => parseSize(a.size) - parseSize(b.size));
+            if (type === 'date-n') sorted.sort((a,b) => new Date(b.releaseDate) - new Date(a.releaseDate));
+            if (type === 'date-o') sorted.sort((a,b) => new Date(a.releaseDate) - new Date(b.releaseDate));
+            if (type === 'default') sorted = [...db];
+            renderGrid(sorted); toggleDrawer(false);
+        }
+
+        function parseSize(s) { let n = parseFloat(s); if(s.toUpperCase().includes('GB')) n *= 1024; return n; }
+        function toggleDrawer(s) { document.getElementById('drawer').classList.toggle('open', s); document.getElementById('overlay').classList.toggle('active', s); }
+        function setTheme(t) { document.body.setAttribute('data-theme', t); toggleDrawer(false); }
+        function closeDetails() { document.getElementById('details').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        
+        function tab(t, el) {
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            currentList = (t === 'all') ? db : db.filter(x => x.type === t);
+            renderGrid(currentList);
+        }
+
+        document.getElementById('search').addEventListener('input', e => {
+            const val = e.target.value.toLowerCase();
+            renderGrid(db.filter(x => x.name.toLowerCase().includes(val)));
+        });
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            const header = document.getElementById('main-header');
+            if (currentScroll > lastScroll && currentScroll > 80) header.classList.add('hide');
+            else header.classList.remove('hide');
+            lastScroll = currentScroll;
+        });
+
+        init();
     </script>
 </body>
-    </html>
-    
+            </html>
+            
