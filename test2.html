@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faizan Market Pro Max</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Outfit', sans-serif; transition: 0.3s; }
+        .light-theme { background-color: #ffffff; color: #111827; }
+        .dark-theme { background-color: #07070a; color: #f3f4f6; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .glass { backdrop-filter: blur(15px); background: rgba(128, 128, 128, 0.1); }
+        .card-item { background: rgba(128, 128, 128, 0.05); border: 1px solid rgba(128, 128, 128, 0.1); }
+    </style>
+</head>
+<body x-data="storeEngine()" :class="darkMode ? 'dark-theme' : 'light-theme'" x-cloak>
+
+    <header class="sticky top-0 z-[100] glass border-b border-gray-500/10 p-4 flex items-center gap-3">
+        <div @click="resetFilters()" class="text-xl font-black text-blue-600 cursor-pointer">FAIZAN</div>
+        <div class="flex-1 relative">
+            <input type="text" x-model="searchQuery" placeholder="Search..." 
+                   class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-500/10 border-none outline-none text-sm font-semibold text-inherit">
+            <span class="absolute left-3 top-2.5 opacity-40">🔍</span>
+        </div>
+        <button @click="showSettings = true" class="p-2 bg-gray-500/10 rounded-xl">⚙️</button>
+    </header>
+
+    <div x-show="errorMessage" class="bg-red-500 text-white text-[10px] p-2 text-center font-bold" x-text="errorMessage"></div>
+
+    <main x-show="!viewingDetail" class="p-4 pb-24">
+        <div class="grid-3">
+            <template x-for="app in filteredApps" :key="app.id">
+                <div @click="openDetail(app)" class="p-2 rounded-2xl text-center card-item active:scale-95 transition-transform">
+                    <img :src="getIcon(app.icon)" class="w-16 h-16 rounded-[1.5rem] mx-auto mb-2 shadow-sm object-cover border border-gray-500/10">
+                    <p class="text-[10px] font-black truncate" x-text="app.name"></p>
+                    <p class="text-[8px] opacity-40 font-bold uppercase" x-text="app.category"></p>
+                </div>
+            </template>
+        </div>
+
+        <div x-show="filteredApps.length === 0" class="mt-20 text-center opacity-30 italic font-bold">
+            No Apps Found. Check info.json
+        </div>
+    </main>
+
+    <div x-show="viewingDetail" class="fixed inset-0 z-[110] bg-inherit overflow-y-auto" x-transition>
+        <template x-if="selectedApp">
+            <div class="pb-20">
+                <div class="p-4 sticky top-0 bg-inherit z-20 flex items-center gap-4 border-b border-gray-500/10">
+                    <button @click="viewingDetail = false" class="text-2xl">←</button>
+                    <span class="font-bold text-sm" x-text="selectedApp.name"></span>
+                </div>
+
+                <div class="p-6 flex gap-5">
+                    <img :src="getIcon(selectedApp.icon)" class="w-24 h-24 rounded-[2rem] shadow-xl">
+                    <div class="flex-1 self-center">
+                        <h1 class="text-2xl font-black" x-text="selectedApp.name"></h1>
+                        <p class="text-blue-500 font-bold text-sm" x-text="selectedApp.owner"></p>
+                    </div>
+                </div>
+
+                <div class="px-6 mb-8 overflow-x-auto flex gap-3 no-scrollbar">
+                    <template x-for="file in (selectedApp.assets?.screenshots || [])">
+                        <div class="min-w-[240px] h-44 rounded-3xl overflow-hidden bg-black border border-gray-500/10">
+                            <template x-if="file.endsWith('.mp4')">
+                                <video :src="file" controls class="w-full h-full object-cover"></video>
+                            </template>
+                            <template x-if="!file.endsWith('.mp4')">
+                                <img :src="file" class="w-full h-full object-cover">
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="px-6 grid gap-3">
+                    <template x-for="v in selectedApp.versions">
+                        <div class="p-4 card-item rounded-[1.5rem] flex justify-between items-center">
+                            <div>
+                                <p class="font-black text-sm" x-text="'v' + v.ver"></p>
+                                <p class="text-[10px] text-blue-500 font-black uppercase" x-text="v.size"></p>
+                            </div>
+                            <a :href="v.url" class="px-8 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black">INSTALL</a>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <div x-show="showSettings" class="fixed inset-0 z-[200] flex items-end justify-center bg-black/80 p-4" x-transition>
+        <div @click.away="showSettings = false" class="bg-inherit w-full max-w-md rounded-[3rem] p-8 border border-gray-500/20">
+            <h2 class="text-2xl font-black mb-6 italic">Filters</h2>
+            <div class="space-y-4">
+                <input type="date" x-model="dateStart" class="w-full p-4 card-item rounded-xl text-xs font-bold outline-none bg-transparent">
+                <input type="date" x-model="dateEnd" class="w-full p-4 card-item rounded-xl text-xs font-bold outline-none bg-transparent">
+                <select x-model="sortBy" class="w-full p-4 card-item rounded-xl text-xs font-black bg-transparent">
+                    <option value="newest">Newest First</option>
+                    <option value="size-desc">Largest Size</option>
+                </select>
+                <button @click="darkMode = !darkMode" class="w-full p-4 card-item rounded-xl text-xs font-black" x-text="darkMode ? '☀️ Switch Light' : '🌙 Switch Dark'"></button>
+            </div>
+            <button @click="showSettings = false" class="w-full mt-6 py-4 bg-blue-600 text-white rounded-[1.5rem] font-black uppercase text-[10px]">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function storeEngine() {
+            return {
+                apps: [],
+                searchQuery: '',
+                darkMode: false,
+                viewingDetail: false,
+                selectedApp: null,
+                showSettings: false,
+                sortBy: 'newest',
+                dateStart: '',
+                dateEnd: '',
+                errorMessage: '',
+
+                async init() {
+                    // Try to fetch from info.json
+                    try {
+                        const response = await fetch('info.json');
+                        if (!response.ok) throw new Error('File not found');
+                        const data = await response.json();
+                        this.apps = data.apps;
+                        console.log("JSON Loaded Successfully");
+                    } catch (e) {
+                        this.errorMessage = "Notice: Running in Demo Mode (info.json not found or CORS blocked)";
+                        // Fallback data agar JSON load na ho
+                        this.apps = [
+                            { id: "1", name: "Free Fire", owner: "Garena", type: "game", category: "Action", releaseDate: "2025-01-01", icon: "N/A", versions: [{ver: "1.0", size: "600 MB", url: "#"}], assets: {screenshots: []} },
+                            { id: "2", name: "CapCut", owner: "Bytedance", type: "app", category: "Editing", releaseDate: "2024-12-20", icon: "N/A", versions: [{ver: "5.2", size: "120 MB", url: "#"}], assets: {screenshots: []} }
+                        ];
+                    }
+                },
+
+                getIcon(path) {
+                    if (!path || path === "N/A") return `https://ui-avatars.com/api/?name=FS&background=0066FF&color=fff`;
+                    return path;
+                },
+
+                get filteredApps() {
+                    let list = this.apps;
+                    let q = this.searchQuery.toLowerCase();
+
+                    if (q === 'allgame') list = list.filter(a => a.type === 'game');
+                    else if (q === 'allapp') list = list.filter(a => a.type === 'app');
+                    else if (q.length > 0) list = list.filter(a => a.name.toLowerCase().includes(q));
+
+                    if (this.dateStart) list = list.filter(a => new Date(a.releaseDate) >= new Date(this.dateStart));
+                    if (this.dateEnd) list = list.filter(a => new Date(a.releaseDate) <= new Date(this.dateEnd));
+
+                    // Sort Logic
+                    list.sort((a, b) => {
+                        if (this.sortBy === 'newest') return new Date(b.releaseDate) - new Date(a.releaseDate);
+                        return 0;
+                    });
+
+                    return list;
+                },
+
+                openDetail(app) { this.selectedApp = app; this.viewingDetail = true; },
+                resetFilters() { this.searchQuery = ''; this.dateStart = ''; this.dateEnd = ''; this.viewingDetail = false; }
+            }
+        }
+    </script>
+</body>
+</html>
