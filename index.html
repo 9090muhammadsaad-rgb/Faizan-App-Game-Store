@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faizan Store | Final Pro</title>
+    <title>Faizan Store | Ultra Pro Store</title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root { --p-green: #01875f; --p-bg: #ffffff; --p-txt: #202124; --p-border: #e8eaed; --p-surface: #f1f3f4; --p-active: #e6f4ea; --p-drawer: #ffffff; }
@@ -40,14 +40,18 @@
         .hero-section img { width: 90px; height: 90px; border-radius: 22%; border: 1px solid var(--p-border); }
         .hero-section h2 { font-size: 24px; font-weight: 700; }
 
+        /* NEW SPECS BOX */
+        .specs-box { margin: 0 20px 20px; padding: 15px; background: var(--p-surface); border-radius: 12px; font-size: 13px; }
+        .mod-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 11px; margin-bottom: 8px; }
+        .badge-mod { background: #fce4ec; color: #d81b60; }
+        .badge-orig { background: #e8f5e9; color: #2e7d32; }
+
         .desc-section { padding: 0 20px 20px; font-size: 14px; color: #5f6368; line-height: 1.6; }
         
-        /* GALLERY FOR ALL FORMATS */
         .gallery { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
         .gallery::-webkit-scrollbar { display: none; }
         .gallery img, .gallery video { height: 180px; width: auto; min-width: 100px; border-radius: 12px; border: 1px solid var(--p-border); background: #eee; }
 
-        /* VERSION BIG BUTTONS */
         .dl-section { padding: 0 20px 30px; }
         .dl-card { background: var(--p-surface); padding: 20px; border-radius: 16px; margin-bottom: 15px; }
         .dl-btn { display: block; width: 100%; background: var(--p-green); color: white; padding: 18px; border-radius: 12px; font-weight: 700; font-size: 18px; text-decoration: none; text-align: center; border: none; cursor: pointer; }
@@ -93,9 +97,13 @@
             <span id="d-nav-title" style="margin-left:20px; font-weight:700"></span>
         </div>
         <div id="d-hero"></div>
+        
+        <div id="d-specs"></div>
+
         <div class="desc-section" id="d-desc"></div>
         <div class="gallery" id="d-gallery"></div>
         <div class="dl-section" id="d-versions"></div>
+        
         <div class="rec-section">
             <h4 style="margin-bottom:15px;">RECOMMENDED</h4>
             <div class="grid" id="d-recs" style="grid-template-columns: repeat(3, 1fr);"></div>
@@ -137,13 +145,31 @@
             const a = db.find(x => x.id === id);
             document.getElementById('d-nav-title').innerText = a.name;
             document.getElementById('d-hero').innerHTML = `<div class="hero-section"><img src="${a.icon}"><h2>${a.name}</h2></div>`;
+            
+            // SHOW SPECS (Owner, SDK, MOD)
+            const badgeClass = a.isMod ? 'badge-mod' : 'badge-orig';
+            const badgeText = a.isMod ? 'MOD UNLOCKED' : 'OFFICIAL';
+            
+            document.getElementById('d-specs').innerHTML = `
+                <div class="specs-box">
+                    <div class="mod-badge ${badgeClass}">${badgeText}</div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span><b>Dev:</b> ${a.ownerName || 'Unknown'}</span>
+                        <span><b>Min SDK:</b> ${a.minSdk || '21'}+</span>
+                    </div>
+                    <div style="font-size:11px; color:gray;">
+                        Release: ${a.releaseDate} | Updated: ${a.lastUpdate || a.releaseDate}
+                    </div>
+                </div>
+            `;
+
             document.getElementById('d-desc').innerHTML = `(( ${a.description} ))`;
             
             const gal = document.getElementById('d-gallery');
             if (a.media && a.media.length > 0) {
                 gal.innerHTML = a.media.map(m => {
                     const ext = m.split('.').pop().toLowerCase();
-                    if (['mp4', 'webm'].includes(ext)) return `<video src="${m}" controls></video>`;
+                    if (['mp4', 'webm', 'mov'].includes(ext)) return `<video src="${m}" controls preload="metadata"></video>`;
                     return `<img src="${m}" onerror="this.style.display='none'">`;
                 }).join('');
                 gal.style.display = 'flex';
@@ -152,7 +178,7 @@
             document.getElementById('d-versions').innerHTML = (a.versions || []).map(v => `
                 <div class="dl-card">
                     <div style="margin-bottom:10px;"><b>Version: ${v.ver}</b> | Size: ${v.size}</div>
-                    <a href="${v.url}" class="dl-btn">Download Now</a>
+                    <a href="${v.url}" class="dl-btn">Download Apk</a>
                 </div>`).join('');
 
             const recs = db.filter(x => x.category === a.category && x.id !== a.id).slice(0, 3);
@@ -204,5 +230,4 @@
         init();
     </script>
 </body>
-            </html>
-            
+</html>
