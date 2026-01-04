@@ -3,116 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faizan Market Ultimate</title>
+    <title>Faizan Store Pro Max</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         [x-cloak] { display: none !important; }
-        body { font-family: 'Outfit', sans-serif; -webkit-user-select: none; }
+        body { font-family: 'Outfit', sans-serif; overflow-x: hidden; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .glass { backdrop-filter: blur(15px); background: rgba(255,255,255,0.7); }
-        .dark .glass { background: rgba(15, 23, 42, 0.8); }
-        .offer-gradient { background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
+        .glass { backdrop-filter: blur(20px); background: rgba(255,255,255,0.8); }
+        .dark .glass { background: rgba(10, 10, 15, 0.85); }
+        .card-active:active { transform: scale(0.92); }
+        .version-card { transition: all 0.3s ease; border: 2px solid transparent; }
+        .version-card:hover { border-color: #3b82f6; }
     </style>
 </head>
-<body x-data="storeEngine()" :class="darkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'" x-cloak>
+<body x-data="storeEngine()" :class="darkMode ? 'dark bg-[#05050a] text-white' : 'bg-gray-50 text-slate-900'" x-cloak>
 
-    <nav class="sticky top-0 z-50 glass border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center gap-3">
-        <div @click="resetToHome()" class="text-xl font-black text-blue-600 cursor-pointer tracking-tighter">FAIZAN</div>
+    <header class="sticky top-0 z-[100] glass border-b dark:border-white/10 px-4 py-4 flex items-center gap-4">
+        <div @click="resetAll()" class="text-2xl font-black bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent cursor-pointer">FAIZAN</div>
         <div class="flex-1 relative">
-            <input type="text" x-model="searchQuery" placeholder="Search games, apps..." 
-                   class="w-full pl-10 pr-4 py-2 rounded-2xl bg-slate-200/50 dark:bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-            <span class="absolute left-3 top-2.5 opacity-40">🔍</span>
+            <input type="text" x-model="searchQuery" placeholder="Search by name or keywords..." 
+                   class="w-full pl-10 pr-4 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all font-semibold">
+            <span class="absolute left-3 top-3.5 opacity-40">🔍</span>
         </div>
-        <button @click="showSettings = true" class="p-2 bg-slate-200/50 dark:bg-slate-800 rounded-xl">⚙️</button>
-    </nav>
+        <button @click="showSettings = true" class="p-3 bg-gray-100 dark:bg-white/5 rounded-2xl">⚙️</button>
+    </header>
 
-    <div class="sticky top-[61px] z-40 glass p-3 flex gap-2 border-b dark:border-slate-800 overflow-x-auto no-scrollbar">
+    <nav class="sticky top-[73px] z-[90] glass flex p-2 gap-2 border-b dark:border-white/5 overflow-x-auto no-scrollbar">
         <template x-for="t in ['All', 'Game', 'App']">
             <button @click="setMainType(t.toLowerCase())" 
-                    :class="filterType === t.toLowerCase() ? 'bg-blue-600 text-white shadow-lg scale-105' : 'bg-white dark:bg-slate-900'"
-                    class="px-8 py-2 rounded-full text-xs font-bold transition-all" x-text="t"></button>
+                    :class="filterType === t.toLowerCase() ? 'bg-blue-600 text-white shadow-xl scale-105' : 'bg-white dark:bg-white/5'"
+                    class="flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all" x-text="t"></button>
         </template>
-    </div>
+    </nav>
 
-    <main x-show="!viewingDetail" class="pb-24">
+    <main x-show="!viewingDetail" class="pb-32">
         
         <div x-show="!searchQuery && !filterCategory">
-            
             <template x-if="getOffer()">
-                <section class="mt-4 px-4">
-                    <div class="relative w-full h-64 rounded-[2.5rem] overflow-hidden shadow-2xl group" @click="openDetail(getOffer())">
+                <div class="p-4">
+                    <div @click="openDetail(getOffer())" class="relative h-72 rounded-[3rem] overflow-hidden shadow-2xl group cursor-pointer">
                         <video :src="getOffer().assets.video" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
-                        <div class="absolute inset-0 offer-gradient p-6 flex flex-col justify-end">
-                            <span class="bg-blue-600 text-[10px] w-fit text-white px-3 py-1 rounded-full mb-2 font-bold uppercase">Featured Offer</span>
-                            <h3 class="text-white text-2xl font-black" x-text="getOffer().name"></h3>
-                            <p class="text-white/60 text-xs" x-text="getOffer().package"></p>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent p-8 flex flex-col justify-end">
+                            <span class="bg-blue-500 text-[10px] w-fit px-3 py-1 rounded-full font-black text-white mb-2">FEATURED OFFER</span>
+                            <h2 class="text-white text-3xl font-black" x-text="getOffer().name"></h2>
+                            <p class="text-white/60 text-sm font-bold" x-text="getOffer().category"></p>
                         </div>
                     </div>
-                </section>
+                </div>
             </template>
 
-            <section class="mt-8 px-4">
-                <h2 class="font-black text-lg mb-4 flex items-center gap-2">🔥 Trending <span x-text="filterType"></span></h2>
-                <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+            <div class="mt-6 px-4">
+                <h3 class="font-black text-xl mb-4">🔥 Trending</h3>
+                <div class="flex gap-4 overflow-x-auto no-scrollbar">
                     <template x-for="app in apps.filter(a => trendingIds.includes(a.id) && (filterType === 'all' || a.type === filterType))">
-                        <div @click="openDetail(app)" class="min-w-[110px] text-center cursor-pointer group">
-                            <div class="relative">
-                                <img :src="getIcon(app.icon)" class="w-24 h-24 rounded-[2rem] shadow-xl mx-auto group-active:scale-90 transition-transform">
-                                <template x-if="app.isNew"><span class="absolute -top-1 -right-1 bg-red-500 text-[8px] text-white px-2 py-1 rounded-full font-bold">NEW</span></template>
+                        <div @click="openDetail(app)" class="min-w-[120px] text-center cursor-pointer">
+                            <div class="relative inline-block">
+                                <img :src="getIcon(app.icon)" class="w-28 h-28 rounded-[2.5rem] shadow-lg border-2 dark:border-white/10">
+                                <template x-if="app.isNew">
+                                    <span class="absolute -top-1 -right-1 bg-red-600 text-[8px] font-black px-2 py-1 rounded-full border-2 border-white dark:border-slate-900">NEW</span>
+                                </template>
                             </div>
-                            <p class="mt-2 text-[11px] font-bold truncate px-1" x-text="app.name"></p>
+                            <p class="mt-2 text-xs font-black truncate" x-text="app.name"></p>
                         </div>
                     </template>
                 </div>
-            </section>
+            </div>
         </div>
 
-        <section class="mt-8 px-4">
-            <div class="flex justify-between items-end mb-4 px-2">
-                <div>
-                    <h2 class="font-black text-xl" x-text="filterCategory ? filterCategory : 'Explore All'"></h2>
-                    <p class="text-[10px] opacity-50 font-bold uppercase tracking-widest" x-text="filterType"></p>
-                </div>
-                <button x-show="filterCategory" @click="filterCategory = ''" class="text-xs text-blue-500 font-bold bg-blue-50 dark:bg-blue-900/20 px-4 py-1.5 rounded-full">Reset Filter</button>
-            </div>
-            
-            <div x-show="filteredApps.length === 0" class="text-center py-20 bg-white dark:bg-slate-900 rounded-[3rem] border border-dashed dark:border-slate-800">
-                <p class="font-black opacity-30 italic">Not Found in this range</p>
+        <div class="mt-10 px-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-black text-2xl" x-text="filterCategory ? filterCategory : 'Explore'"></h3>
+                <button x-show="filterCategory" @click="filterCategory = ''" class="text-xs font-black text-blue-500">RESET ALL</button>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div x-show="filteredApps.length === 0" class="py-20 text-center opacity-30">
+                <p class="text-4xl">🏜️</p>
+                <p class="font-black mt-4">NOTHING FOUND HERE</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-5">
                 <template x-for="app in filteredApps" :key="app.id">
                     <div @click="handleAppClick(app)" 
-                         class="p-4 rounded-[2.2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm active:scale-95 transition-all">
-                        <img :src="getIcon(app.icon)" class="w-16 h-16 rounded-2xl mb-3 mx-auto shadow-md">
+                         class="card-active p-5 rounded-[2.5rem] bg-white dark:bg-white/5 border dark:border-white/5 shadow-sm transition-all overflow-hidden relative">
+                        <img :src="getIcon(app.icon)" class="w-16 h-16 rounded-2xl mx-auto mb-4 shadow-md">
                         <div class="text-center">
-                            <h3 class="font-bold text-sm truncate" x-text="app.name"></h3>
-                            <p class="text-[9px] text-blue-500 font-black uppercase" x-text="app.category"></p>
+                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1" x-text="app.category"></p>
+                            <h4 class="font-black text-sm truncate" x-text="app.name"></h4>
                         </div>
                     </div>
                 </template>
             </div>
-        </section>
-
-        <div class="mt-20 mb-10 text-center opacity-20 font-black italic tracking-widest text-sm">
-            --- END OF LIST ---
         </div>
+
+        <div class="mt-20 text-center font-black opacity-10 tracking-[1em] text-sm">END OF MARKET</div>
     </main>
 
-    <div x-show="viewingDetail" class="fixed inset-0 z-[60] bg-slate-50 dark:bg-slate-950 overflow-y-auto" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-y-full">
+    <div x-show="viewingDetail" class="fixed inset-0 z-[110] bg-white dark:bg-[#05050a] overflow-y-auto" x-transition>
         <template x-if="selectedApp">
-            <div class="pb-24">
-                <div class="p-4 flex items-center justify-between sticky top-0 glass z-20">
-                    <button @click="viewingDetail = false" class="p-3 bg-slate-200 dark:bg-slate-800 rounded-full">✕</button>
+            <div class="pb-32">
+                <div class="sticky top-0 z-50 p-4 glass flex justify-between items-center">
+                    <button @click="viewingDetail = false" class="p-3 bg-gray-100 dark:bg-white/10 rounded-full font-black">✕</button>
                     <span class="font-black text-xs uppercase" x-text="selectedApp.name"></span>
                     <div class="w-10"></div>
                 </div>
 
-                <div class="flex gap-4 overflow-x-auto px-6 mt-6 no-scrollbar h-96">
+                <div class="flex gap-4 overflow-x-auto px-6 mt-6 no-scrollbar h-[500px]">
                     <template x-for="file in selectedApp.assets.screenshots">
-                        <div class="min-w-[280px] h-full rounded-[2.5rem] overflow-hidden bg-slate-200 dark:bg-slate-800 shadow-2xl border-4 border-white dark:border-slate-900">
+                        <div class="min-w-[300px] h-full rounded-[3rem] overflow-hidden bg-gray-200 dark:bg-white/5 shadow-2xl border-4 border-white dark:border-white/10 flex-shrink-0">
                             <template x-if="isVideo(file)">
                                 <video :src="file" controls class="w-full h-full object-cover"></video>
                             </template>
@@ -123,27 +122,28 @@
                     </template>
                 </div>
 
-                <div class="px-8 mt-8">
-                    <h1 class="text-3xl font-black mb-1" x-text="selectedApp.name"></h1>
-                    <p class="text-blue-600 font-bold mb-4" x-text="selectedApp.owner"></p>
-                    <div class="flex gap-2">
-                        <span class="px-4 py-1 bg-slate-200 dark:bg-slate-800 rounded-full text-[10px] font-bold" x-text="selectedApp.category"></span>
-                        <span class="px-4 py-1 bg-slate-200 dark:bg-slate-800 rounded-full text-[10px] font-bold" x-text="selectedApp.releaseDate"></span>
+                <div class="px-8 mt-10">
+                    <div class="flex gap-6 items-center">
+                        <img :src="getIcon(selectedApp.icon)" class="w-32 h-32 rounded-[3rem] shadow-2xl">
+                        <div>
+                            <h1 class="text-3xl font-black leading-tight" x-text="selectedApp.name"></h1>
+                            <p class="text-blue-500 font-black text-sm mb-2" x-text="selectedApp.owner"></p>
+                            <span class="px-4 py-1.5 bg-gray-100 dark:bg-white/10 rounded-full text-[10px] font-black" x-text="selectedApp.category"></span>
+                        </div>
                     </div>
-                    
-                    <p class="mt-8 text-sm opacity-70 leading-relaxed font-medium" x-text="selectedApp.description"></p>
+                    <p class="mt-10 text-sm opacity-60 leading-relaxed font-bold" x-text="selectedApp.description"></p>
                 </div>
 
-                <div class="px-8 mt-10">
-                    <h2 class="text-xl font-black mb-6">Downloads & Versions</h2>
-                    <div class="grid gap-4">
+                <div class="px-8 mt-12">
+                    <h3 class="font-black text-2xl mb-6">Download Versions</h3>
+                    <div class="space-y-4">
                         <template x-for="v in selectedApp.versions">
-                            <div class="flex items-center justify-between p-6 bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border dark:border-slate-800">
+                            <div class="version-card p-6 bg-gray-50 dark:bg-white/5 rounded-[2rem] flex items-center justify-between">
                                 <div>
-                                    <p class="font-black text-lg" x-text="'v' + v.ver"></p>
-                                    <p class="text-xs font-bold text-blue-500" x-text="'Size: ' + v.size"></p>
+                                    <p class="font-black text-xl" x-text="'Version ' + v.ver"></p>
+                                    <p class="text-xs font-black text-blue-500 uppercase" x-text="'Size: ' + v.size"></p>
                                 </div>
-                                <a :href="v.url" class="px-10 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs shadow-xl shadow-blue-600/30">DOWNLOAD</a>
+                                <a :href="v.url" class="px-8 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs shadow-xl shadow-blue-600/30 transition-transform active:scale-90">GET</a>
                             </div>
                         </template>
                     </div>
@@ -152,28 +152,22 @@
         </template>
     </div>
 
-    <div x-show="showSettings" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4" x-transition>
-        <div @click.away="showSettings = false" class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[3rem] p-8">
-            <h2 class="text-2xl font-black mb-8 italic">Market Settings</h2>
+    <div x-show="showSettings" class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm" x-transition>
+        <div @click.away="showSettings = false" class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[3rem] p-10 shadow-2xl">
+            <h2 class="text-3xl font-black mb-10 italic">Filter Settings</h2>
             
-            <div class="space-y-6">
-                <div class="p-5 bg-slate-100 dark:bg-slate-800 rounded-3xl">
-                    <label class="text-[10px] font-black uppercase opacity-40 block mb-4 italic">Filter by Release Date</label>
+            <div class="space-y-8">
+                <div>
+                    <p class="text-[10px] font-black opacity-40 uppercase mb-4">Date Range Filter</p>
                     <div class="flex gap-4">
-                        <div class="flex-1">
-                            <p class="text-[9px] font-bold opacity-50 mb-1">FROM</p>
-                            <input type="date" x-model="dateStart" class="bg-transparent text-xs font-bold outline-none w-full">
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-[9px] font-bold opacity-50 mb-1">TO</p>
-                            <input type="date" x-model="dateEnd" class="bg-transparent text-xs font-bold outline-none w-full">
-                        </div>
+                        <input type="date" x-model="dateStart" class="flex-1 bg-gray-100 dark:bg-white/5 p-3 rounded-xl text-[10px] font-bold outline-none">
+                        <input type="date" x-model="dateEnd" class="flex-1 bg-gray-100 dark:bg-white/5 p-3 rounded-xl text-[10px] font-bold outline-none">
                     </div>
                 </div>
 
-                <div class="p-5 bg-slate-100 dark:bg-slate-800 rounded-3xl">
-                    <label class="text-[10px] font-black uppercase opacity-40 block mb-3 italic">Sort Preference</label>
-                    <select x-model="sortBy" class="w-full bg-transparent font-black outline-none">
+                <div>
+                    <p class="text-[10px] font-black opacity-40 uppercase mb-4">Sort By</p>
+                    <select x-model="sortBy" class="w-full bg-gray-100 dark:bg-white/5 p-4 rounded-xl font-black text-xs outline-none appearance-none">
                         <option value="newest">Newest Released</option>
                         <option value="oldest">Oldest Released</option>
                         <option value="size-desc">Size: High to Low</option>
@@ -181,15 +175,15 @@
                     </select>
                 </div>
 
-                <div @click="darkMode = !darkMode" class="flex justify-between items-center p-5 bg-slate-100 dark:bg-slate-800 rounded-3xl cursor-pointer">
-                    <span class="font-black text-sm uppercase">Dark Interface</span>
-                    <div class="w-12 h-6 rounded-full relative transition-colors" :class="darkMode ? 'bg-blue-600' : 'bg-slate-300'">
+                <div @click="darkMode = !darkMode" class="flex justify-between items-center p-5 bg-gray-100 dark:bg-white/5 rounded-2xl cursor-pointer">
+                    <span class="font-black text-xs uppercase">Night Mode</span>
+                    <div class="w-12 h-6 rounded-full relative" :class="darkMode ? 'bg-blue-600' : 'bg-gray-300'">
                         <div class="absolute top-1 w-4 h-4 bg-white rounded-full transition-all" :class="darkMode ? 'right-1' : 'left-1'"></div>
                     </div>
                 </div>
             </div>
             
-            <button @click="showSettings = false" class="w-full mt-8 py-5 bg-blue-600 text-white rounded-[2rem] font-black shadow-2xl shadow-blue-500/40 uppercase tracking-widest text-xs">Save & Apply</button>
+            <button @click="showSettings = false" class="w-full mt-10 py-5 bg-blue-600 text-white rounded-[1.5rem] font-black shadow-2xl uppercase tracking-tighter">Apply Engine Filters</button>
         </div>
     </div>
 
@@ -201,28 +195,29 @@
                 searchQuery: '',
                 filterType: 'all',
                 filterCategory: '',
-                darkMode: false,
+                darkMode: true,
                 showSettings: false,
                 viewingDetail: false,
                 selectedApp: null,
                 sortBy: 'newest',
                 dateStart: '',
                 dateEnd: '',
-                lastClick: 0,
+                lastClickTime: 0,
 
                 async init() {
-                    const res = await fetch('info.json');
-                    const data = await res.json();
-                    this.apps = data.apps;
-                    this.trendingIds = data.trending_ids;
+                    try {
+                        const res = await fetch('info.json');
+                        const data = await res.json();
+                        this.apps = data.apps;
+                        this.trendingIds = data.trending_ids;
+                    } catch (e) { console.error("JSON Error"); }
                 },
 
                 isVideo(path) { return /\.(mp4|webm|mov|web4)$/i.test(path); },
 
-                // Fix: Offer filtered by type
                 getOffer() {
                     const pool = this.apps.filter(a => a.assets.video && (this.filterType === 'all' || a.type === this.filterType));
-                    return pool.length > 0 ? pool[0] : null; 
+                    return pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
                 },
 
                 setMainType(type) {
@@ -231,24 +226,26 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
+                // THE POWERFUL DOUBLE TAP LOGIC
                 handleAppClick(app) {
                     const now = Date.now();
-                    if (now - this.lastClick < 300) {
-                        // Double Tap: Filter Category
+                    const DOUBLE_TAP_DELAY = 300; 
+                    
+                    if ((now - this.lastClickTime) < DOUBLE_TAP_DELAY) {
+                        // Success: Double Tap
                         this.filterCategory = app.category;
+                        window.scrollTo({ top: 400, behavior: 'smooth' });
                     } else {
-                        // Single Tap: Open Detail
+                        // Success: Single Tap
                         this.openDetail(app);
                     }
-                    this.lastClick = now;
+                    this.lastClickTime = now;
                 },
 
                 get filteredApps() {
                     let list = this.apps.filter(app => {
                         const q = this.searchQuery.toLowerCase();
                         const matchesSearch = app.name.toLowerCase().includes(q) || (app.keywords && app.keywords.some(k => k.toLowerCase().includes(q)));
-                        
-                        // Strict Filtering Fix
                         const matchesType = this.filterType === 'all' || app.type === this.filterType;
                         const matchesCat = !this.filterCategory || app.category === this.filterCategory;
                         
@@ -259,25 +256,30 @@
                         return matchesSearch && matchesType && matchesCat && matchesDate;
                     });
 
-                    // Sorting
+                    // Advanced Size-Aware Sort
                     list.sort((a, b) => {
                         if (this.sortBy === 'newest') return new Date(b.releaseDate) - new Date(a.releaseDate);
                         if (this.sortBy === 'oldest') return new Date(a.releaseDate) - new Date(b.releaseDate);
-                        if (this.sortBy.includes('size')) {
-                            const parseSize = (s) => {
-                                const m = (s || "0 MB").match(/(\d+(\.\d+)?)\s*(MB|GB)/i);
-                                if (!m) return 0;
-                                return parseFloat(m[1]) * (m[3].toUpperCase() === 'GB' ? 1024 : 1);
-                            };
-                            return this.sortBy === 'size-desc' ? parseSize(b.size) - parseSize(a.size) : parseSize(a.size) - parseSize(b.size);
-                        }
+                        
+                        const parseSize = (app) => {
+                            const s = app.versions[0]?.size || "0 MB";
+                            const m = s.match(/(\d+(\.\d+)?)\s*(MB|GB|TB)/i);
+                            if (!m) return 0;
+                            let val = parseFloat(m[1]);
+                            if (m[3].toUpperCase() === 'GB') val *= 1024;
+                            if (m[3].toUpperCase() === 'TB') val *= 1024 * 1024;
+                            return val;
+                        };
+
+                        if (this.sortBy === 'size-desc') return parseSize(b) - parseSize(a);
+                        if (this.sortBy === 'size-asc') return parseSize(a) - parseSize(b);
                         return 0;
                     });
                     return list;
                 },
 
                 getIcon(path) {
-                    return (!path || path.includes('FS')) ? `https://ui-avatars.com/api/?name=F&background=0D8ABC&color=fff&size=256` : path;
+                    return (!path || path.includes('FS')) ? `https://ui-avatars.com/api/?name=F&background=0D8ABC&color=fff&size=512` : path;
                 },
 
                 openDetail(app) {
@@ -285,16 +287,16 @@
                     this.viewingDetail = true;
                 },
 
-                resetToHome() {
+                resetAll() {
                     this.filterType = 'all';
                     this.filterCategory = '';
                     this.searchQuery = '';
                     this.viewingDetail = false;
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); 
                 }
             }
         }
     </script>
 </body>
-                        </html>
+        </html>
     
