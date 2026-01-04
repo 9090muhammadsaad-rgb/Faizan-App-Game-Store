@@ -3,53 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Admin | Live Editor</title>
+    <title>Store Admin | Media & Content Editor</title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root { --p-green: #01875f; --p-bg: #ffffff; --p-txt: #202124; --p-border: #e8eaed; --p-surface: #f1f3f4; --p-active: #e6f4ea; }
         [data-theme="dark"] { --p-bg: #121212; --p-txt: #e8eaed; --p-border: #333; --p-surface: #2d2d2d; --p-active: #1a332a; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Google Sans', sans-serif; }
-        body { background: var(--p-bg); color: var(--p-txt); transition: 0.3s; padding-bottom: 100px; }
+        body { background: var(--p-bg); color: var(--p-txt); padding-bottom: 120px; }
 
-        /* HEADER (SAME AS INDEX) */
         header { position: fixed; top: 0; width: 100%; background: var(--p-bg); z-index: 1000; padding: 12px 16px; border-bottom: 1px solid var(--p-border); display: flex; align-items: center; gap: 10px; }
         .search-pill { flex: 1; display: flex; align-items: center; background: var(--p-surface); border-radius: 8px; padding: 0 12px; }
         .search-input { width: 100%; border: none; background: transparent; padding: 12px; font-size: 15px; outline: none; color: var(--p-txt); }
-        .add-btn { background: var(--p-green); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .add-btn { background: var(--p-green); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* APP GRID VIEW */
         .container { padding: 80px 16px 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 18px; }
-        .app-card { position: relative; background: var(--p-surface); border-radius: 20px; padding: 10px; text-align: center; border: 1px solid var(--p-border); }
-        .app-card img { width: 100%; aspect-ratio: 1/1; border-radius: 18px; object-fit: cover; }
-        .app-name { font-size: 12px; font-weight: 500; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .app-card { background: var(--p-surface); border-radius: 20px; padding: 10px; text-align: center; border: 1px solid var(--p-border); transition: 0.3s; }
+        .app-card img { width: 100%; aspect-ratio: 1/1; border-radius: 18px; object-fit: cover; margin-bottom: 8px; }
         
-        /* EDIT / DELETE OVERLAY */
-        .card-actions { margin-top: 10px; display: flex; gap: 5px; justify-content: center; }
-        .btn-sm { padding: 5px 10px; border-radius: 5px; border: none; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .card-actions { display: flex; gap: 5px; margin-top: 10px; }
+        .btn-sm { flex: 1; padding: 8px; border-radius: 6px; border: none; font-size: 12px; cursor: pointer; font-weight: bold; }
         .edit-btn { background: #1a73e8; color: white; }
         .del-btn { background: #d93025; color: white; }
 
-        /* EDITOR MODAL / FORM */
+        /* EDITOR MODAL */
         #editor-modal { position: fixed; inset: 0; background: var(--p-bg); z-index: 5000; display: none; overflow-y: auto; padding: 20px; }
-        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--p-border); padding-bottom: 10px; }
         .field { margin-bottom: 15px; }
-        .field label { display: block; font-size: 12px; color: var(--p-green); font-weight: bold; margin-bottom: 5px; }
-        .field input, .field textarea, .field select { width: 100%; padding: 12px; border: 1px solid var(--p-border); border-radius: 8px; background: var(--p-surface); color: var(--p-txt); outline: none; }
+        .field label { display: block; font-size: 13px; color: var(--p-green); font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        .field input, .field textarea, .field select { width: 100%; padding: 14px; border: 1px solid var(--p-border); border-radius: 10px; background: var(--p-surface); color: var(--p-txt); outline: none; font-size: 14px; }
         
-        .version-box { background: var(--p-surface); padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px dashed gray; }
+        .section-title { background: var(--p-active); color: var(--p-green); padding: 10px; border-radius: 8px; margin: 20px 0 10px; font-weight: bold; font-size: 14px; }
+        .version-box { background: var(--p-surface); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--p-border); }
 
-        /* OUTPUT PANEL */
-        #output-panel { position: fixed; bottom: 0; width: 100%; background: var(--p-active); padding: 15px; border-top: 2px solid var(--p-green); z-index: 4000; display: flex; justify-content: space-around; }
-        .main-save-btn { background: var(--p-green); color: white; padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+        #output-panel { position: fixed; bottom: 0; width: 100%; background: var(--p-bg); padding: 20px; border-top: 2px solid var(--p-green); z-index: 4000; display: flex; gap: 10px; }
+        .main-save-btn { flex: 1; background: var(--p-green); color: white; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="search-pill">
-            <input type="text" id="search" class="search-input" placeholder="Search to edit..." oninput="renderAdminGrid()">
+            <input type="text" id="search" class="search-input" placeholder="Search to edit/delete..." oninput="renderAdminGrid()">
         </div>
         <button class="add-btn" onclick="openEditor()">+</button>
     </header>
@@ -59,72 +54,52 @@
     </div>
 
     <div id="editor-modal">
-        <div class="form-header">
-            <h2 id="modal-title">Edit Item</h2>
-            <button onclick="closeEditor()" style="background:none; border:none; font-size:28px; color:var(--p-txt);">×</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 id="modal-title" style="color:var(--p-green);">Editor</h2>
+            <button onclick="closeEditor()" style="background:none; border:none; font-size:35px; color:var(--p-txt); cursor:pointer;">&times;</button>
         </div>
 
         <input type="hidden" id="edit-index">
         
+        <div class="section-title">Basic Information</div>
+        <div class="field"><label>App Icon Path</label><input type="text" id="f-icon" placeholder="icons/game-icon.jpeg"></div>
+        <div class="field"><label>App Name</label><input type="text" id="f-name"></div>
+        <div class="field"><label>Category</label><input type="text" id="f-cat" placeholder="Action, Tools, etc."></div>
+        <div class="field"><label>Type</label><select id="f-type"><option value="game">Game</option><option value="app">App</option></select></div>
+        <div class="field"><label>Description</label><textarea id="f-desc" rows="4"></textarea></div>
+        <div class="field"><label>Release Date</label><input type="date" id="f-date"></div>
+
+        <div class="section-title">Screenshots & Videos</div>
         <div class="field">
-            <label>ICON PATH (e.g. icons/mygame.png)</label>
-            <input type="text" id="f-icon">
+            <label>Media Paths (Separate with comma ,)</label>
+            <textarea id="f-media" rows="3" placeholder="assets/screen1.jpg, assets/screen2.png, assets/trailer.mp4"></textarea>
+            <small style="color:gray; font-size:11px;">Note: You can use .jpg, .png, .webp and .mp4 links.</small>
         </div>
 
-        <div class="field">
-            <label>APP NAME</label>
-            <input type="text" id="f-name">
-        </div>
+        <div class="section-title">Download Versions</div>
+        <div id="v-list"></div>
+        <button onclick="addVersionField()" style="width:100%; padding:10px; background:var(--p-active); color:var(--p-green); border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:5px;">+ Add New Version</button>
 
-        <div class="field">
-            <label>CATEGORY</label>
-            <input type="text" id="f-cat">
-        </div>
-
-        <div class="field">
-            <label>DESCRIPTION</label>
-            <textarea id="f-desc" rows="3"></textarea>
-        </div>
-
-        <div class="field">
-            <label>TYPE</label>
-            <select id="f-type">
-                <option value="game">Game</option>
-                <option value="app">App</option>
-            </select>
-        </div>
-
-        <div class="field">
-            <label>RELEASE DATE (YYYY-MM-DD)</label>
-            <input type="date" id="f-date">
-        </div>
-
-        <div id="v-list">
-            <label style="color:var(--p-green); font-size:12px; font-weight:bold;">VERSIONS & DOWNLOAD LINKS</label>
-        </div>
-        <button onclick="addVersionField()" style="padding:8px; margin-top:5px; background:#ddd; border:none; border-radius:5px; font-size:11px;">+ Add Version</button>
-
-        <div style="margin-top:30px;">
-            <button class="main-save-btn" style="width:100%; padding:18px;" onclick="saveChanges()">CONFIRM & ADD TO LIST</button>
+        <div style="margin-top:40px;">
+            <button class="main-save-btn" style="width:100%; font-size:18px;" onclick="saveChanges()">SAVE CHANGES TO LIST</button>
         </div>
     </div>
 
     <div id="output-panel">
-        <button class="main-save-btn" onclick="copyJSON()">📋 Copy Updated JSON</button>
-        <button class="main-save-btn" style="background:#1a73e8;" onclick="downloadJSON()">📥 Download info.json</button>
+        <button class="main-save-btn" style="background:#1a73e8;" onclick="copyJSON()">📋 Copy JSON</button>
+        <button class="main-save-btn" onclick="downloadJSON()">📥 Download info.json</button>
     </div>
 
     <script>
         let db = [];
 
-        // 1. Fetch JSON just like index.html
         async function loadData() {
             try {
                 const res = await fetch('info.json');
                 const data = await res.json();
                 db = data.apps;
                 renderAdminGrid();
-            } catch (e) { alert("Please ensure info.json is in the same folder."); }
+            } catch (e) { alert("Ready to start! (Add your first game)"); }
         }
 
         function renderAdminGrid() {
@@ -134,8 +109,8 @@
 
             grid.innerHTML = filtered.map((a, index) => `
                 <div class="app-card">
-                    <img src="${a.icon}">
-                    <div class="app-name">${a.name}</div>
+                    <img src="${a.icon}" onerror="this.src='https://via.placeholder.com/150'">
+                    <div style="font-size:13px; font-weight:700; height:35px; overflow:hidden;">${a.name}</div>
                     <div class="card-actions">
                         <button class="btn-sm edit-btn" onclick="openEditor(${index})">Edit</button>
                         <button class="btn-sm del-btn" onclick="deleteItem(${index})">Del</button>
@@ -147,23 +122,23 @@
         function openEditor(index = -1) {
             document.getElementById('editor-modal').style.display = 'block';
             document.getElementById('edit-index').value = index;
-            document.getElementById('v-list').innerHTML = '<label>VERSIONS</label>';
+            document.getElementById('v-list').innerHTML = '';
 
             if(index > -1) {
                 const a = db[index];
-                document.getElementById('modal-title').innerText = "Edit: " + a.name;
                 document.getElementById('f-icon').value = a.icon;
                 document.getElementById('f-name').value = a.name;
                 document.getElementById('f-cat').value = a.category;
                 document.getElementById('f-desc').value = a.description;
                 document.getElementById('f-type').value = a.type;
                 document.getElementById('f-date').value = a.releaseDate;
+                document.getElementById('f-media').value = a.media ? a.media.join(', ') : "";
                 a.versions.forEach(v => addVersionField(v.ver, v.size, v.url));
             } else {
-                document.getElementById('modal-title').innerText = "Add New Game/App";
                 document.getElementById('f-icon').value = "icons/";
                 document.getElementById('f-name').value = "";
                 document.getElementById('f-desc').value = "";
+                document.getElementById('f-media').value = "";
                 addVersionField();
             }
         }
@@ -172,15 +147,19 @@
             const div = document.createElement('div');
             div.className = "version-box";
             div.innerHTML = `
-                <input type="text" class="v-ver" placeholder="Version" value="${ver}" style="width:30%; margin-bottom:5px;">
-                <input type="text" class="v-size" placeholder="Size" value="${size}" style="width:65%; margin-bottom:5px;">
-                <input type="text" class="v-url" placeholder="Download Link" value="${url}" style="width:100%;">
+                <input type="text" class="v-ver" placeholder="Version (e.g v1.0)" value="${ver}" style="width:40%; margin-bottom:8px;">
+                <input type="text" class="v-size" placeholder="Size (e.g 500 MB)" value="${size}" style="width:55%; margin-bottom:8px;">
+                <input type="text" class="v-url" placeholder="Direct Download Link" value="${url}" style="width:100%;">
+                <button onclick="this.parentElement.remove()" style="background:none; border:none; color:red; font-size:11px; margin-top:5px; cursor:pointer;">&times; Remove Version</button>
             `;
             document.getElementById('v-list').appendChild(div);
         }
 
         function saveChanges() {
             const index = document.getElementById('edit-index').value;
+            const mediaStr = document.getElementById('f-media').value;
+            const mediaArr = mediaStr.split(',').map(s => s.trim()).filter(s => s !== "");
+
             const vers = [];
             document.querySelectorAll('.version-box').forEach(box => {
                 const v = box.querySelector('.v-ver').value;
@@ -191,8 +170,8 @@
                 });
             });
 
-            const updatedApp = {
-                id: "id_" + Date.now(),
+            const appData = {
+                id: index > -1 ? db[index].id : "id_" + Date.now(),
                 name: document.getElementById('f-name').value,
                 icon: document.getElementById('f-icon').value,
                 type: document.getElementById('f-type').value,
@@ -201,37 +180,31 @@
                 releaseDate: document.getElementById('f-date').value,
                 description: document.getElementById('f-desc').value,
                 versions: vers,
-                media: []
+                media: mediaArr
             };
 
-            if(index > -1) db[index] = updatedApp;
-            else db.push(updatedApp);
+            if(index > -1) db[index] = appData;
+            else db.push(appData);
 
             closeEditor();
             renderAdminGrid();
         }
 
-        function deleteItem(index) {
-            if(confirm("Are you sure?")) {
-                db.splice(index, 1);
-                renderAdminGrid();
-            }
-        }
-
+        function deleteItem(index) { if(confirm("Delete this app?")) { db.splice(index, 1); renderAdminGrid(); } }
         function closeEditor() { document.getElementById('editor-modal').style.display = 'none'; }
-
+        
         function copyJSON() {
-            const finalJSON = JSON.stringify({ apps: db }, null, 2);
-            navigator.clipboard.writeText(finalJSON);
-            alert("Code Copied! Paste it in your info.json file.");
+            const data = JSON.stringify({ apps: db }, null, 2);
+            navigator.clipboard.writeText(data);
+            alert("Code Copied! Now paste it in info.json");
         }
 
         function downloadJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ apps: db }, null, 2));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", "info.json");
-            dlAnchorElem.click();
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", "info.json");
+            dl.click();
         }
 
         loadData();
