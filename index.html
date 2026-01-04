@@ -3,69 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faizan Market Pro</title>
+    <title>Faizan Store Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
     <style>
         [x-cloak] { display: none !important; }
-        body { font-family: 'Outfit', sans-serif; transition: background 0.3s, color 0.3s; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        body { font-family: 'Outfit', sans-serif; transition: 0.3s ease; }
+        
+        /* Theme Logic: Text color automatic change hoga */
+        .light-theme { background-color: #ffffff; color: #111827; }
+        .dark-theme { background-color: #05050a; color: #f3f4f6; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        /* Automatic Light/Dark Text */
-        .dark { background-color: #0a0a0f; color: #ffffff; }
-        .light { background-color: #f8fafc; color: #0f172a; }
+        .glass { backdrop-filter: blur(15px); background: rgba(128, 128, 128, 0.1); }
+        .card-bg { background: rgba(128, 128, 128, 0.05); border: 1px solid rgba(128, 128, 128, 0.1); }
     </style>
 </head>
-<body x-data="storeEngine()" :class="darkMode ? 'dark' : 'light'" x-cloak>
+<body x-data="storeEngine()" :class="darkMode ? 'dark-theme' : 'light-theme'" x-cloak>
 
-    <nav class="sticky top-0 z-[100] p-4 bg-inherit border-b border-gray-500/10 flex items-center gap-3">
+    <header class="sticky top-0 z-[100] glass border-b border-gray-500/10 p-4 flex items-center gap-3">
         <div @click="resetAll()" class="text-xl font-black text-blue-600 cursor-pointer">FAIZAN</div>
         <div class="flex-1 relative">
             <input type="text" x-model="searchQuery" 
                    placeholder="Try 'allgame' or 'pub:Garena'..." 
-                   class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-500/10 border-none outline-none text-sm font-semibold">
+                   class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-500/10 border-none outline-none text-sm font-semibold text-inherit">
             <span class="absolute left-3 top-2.5 opacity-40">🔍</span>
         </div>
-    </nav>
+        <button @click="showSettings = true" class="p-2 bg-gray-500/10 rounded-xl">⚙️</button>
+    </header>
 
     <main x-show="!viewingDetail" class="p-4 pb-20">
         
         <template x-if="shouldShowOffer() && getOffer()">
-            <div class="mb-6">
-                <div @click="openDetail(getOffer())" class="relative h-48 rounded-3xl overflow-hidden shadow-2xl">
-                    <video :src="getOffer().assets.video" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent p-4 flex flex-col justify-end">
-                        <h2 class="text-white text-lg font-black" x-text="getOffer().name"></h2>
-                        <p class="text-white/60 text-[10px]" x-text="'Featured ' + getOffer().type"></p>
-                    </div>
+            <div @click="openDetail(getOffer())" class="relative h-44 rounded-[2rem] overflow-hidden mb-6 shadow-xl cursor-pointer">
+                <video :src="getOffer().assets.video" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 p-4 flex flex-col justify-end">
+                    <h2 class="text-white text-lg font-black" x-text="getOffer().name"></h2>
+                    <p class="text-white/60 text-[9px] font-bold" x-text="getOffer().package"></p>
                 </div>
             </div>
         </template>
 
         <div class="grid-3">
             <template x-for="app in filteredApps" :key="app.id">
-                <div @click="openDetail(app)" class="p-2 rounded-2xl text-center active:scale-95 transition-transform bg-gray-500/5 border border-gray-500/10">
-                    <img :src="app.icon" class="w-16 h-16 rounded-[1.5rem] mx-auto mb-2 shadow-md">
+                <div @click="openDetail(app)" class="p-2 rounded-2xl text-center card-bg active:scale-95 transition-transform">
+                    <img :src="getIcon(app.icon)" class="w-16 h-16 rounded-[1.5rem] mx-auto mb-2 shadow-sm border border-gray-500/10">
                     <p class="text-[10px] font-black truncate" x-text="app.name"></p>
-                    <p class="text-[8px] opacity-50 uppercase font-bold" x-text="app.category"></p>
+                    <p class="text-[8px] opacity-40 font-bold uppercase" x-text="app.category"></p>
                 </div>
             </template>
         </div>
 
-        <div x-show="filteredApps.length === 0" class="mt-20 text-center opacity-40 font-bold italic">Command Not Found...</div>
+        <div x-show="filteredApps.length === 0" class="mt-20 text-center opacity-30 italic font-bold">No Data in this range.</div>
     </main>
 
     <div x-show="viewingDetail" class="fixed inset-0 z-[110] bg-inherit overflow-y-auto" x-transition>
         <template x-if="selectedApp">
             <div class="pb-24">
-                <div class="p-4 sticky top-0 bg-inherit z-20 flex items-center gap-4 border-b border-gray-500/10">
-                    <button @click="viewingDetail = false" class="text-2xl">←</button>
+                <div class="p-4 flex items-center gap-4 sticky top-0 bg-inherit z-20 border-b border-gray-500/10">
+                    <button @click="viewingDetail = false" class="text-2xl font-bold">←</button>
                     <span class="font-bold text-sm" x-text="selectedApp.name"></span>
                 </div>
 
                 <div class="p-6 flex gap-5">
-                    <img :src="selectedApp.icon" class="w-24 h-24 rounded-[2rem] shadow-2xl">
+                    <img :src="getIcon(selectedApp.icon)" class="w-24 h-24 rounded-[2rem] shadow-xl">
                     <div class="flex-1 self-center">
                         <h1 class="text-2xl font-black" x-text="selectedApp.name"></h1>
                         <p @click="searchQuery = 'pub:'+selectedApp.owner; viewingDetail = false" 
@@ -74,49 +77,62 @@
                     </div>
                 </div>
 
-                <div class="px-6 mb-8 overflow-x-auto flex gap-3 no-scrollbar">
-                    <template x-for="file in selectedApp.assets.screenshots">
-                        <div class="min-w-[220px] h-40 rounded-2xl overflow-hidden bg-black border border-gray-500/20">
-                            <template x-if="isVideo(file)">
-                                <video :src="file" controls class="w-full h-full object-cover"></video>
-                            </template>
-                            <template x-if="!isVideo(file)">
-                                <img :src="file" class="w-full h-full object-cover">
+                <div class="px-6 mb-8">
+                    <template x-if="hasMedia(selectedApp)">
+                        <div class="flex gap-3 overflow-x-auto no-scrollbar">
+                            <template x-for="file in selectedApp.assets.screenshots">
+                                <div class="min-w-[240px] h-44 rounded-3xl overflow-hidden bg-black border border-gray-500/10">
+                                    <template x-if="isVideo(file)">
+                                        <video :src="file" controls class="w-full h-full object-cover"></video>
+                                    </template>
+                                    <template x-if="!isVideo(file)">
+                                        <img :src="file" class="w-full h-full object-cover">
+                                    </template>
+                                </div>
                             </template>
                         </div>
                     </template>
+                    <template x-if="!hasMedia(selectedApp)">
+                        <div class="h-32 rounded-3xl border-2 border-dashed border-gray-500/20 flex items-center justify-center opacity-30 italic text-xs font-bold">No Media Available</div>
+                    </template>
                 </div>
 
-                <div class="px-6 grid gap-3">
-                    <div class="flex justify-between text-[10px] font-black opacity-50 uppercase border-b border-gray-500/10 pb-2">
-                        <span>Released: <span x-text="selectedApp.releaseDate"></span></span>
-                        <span>Updated: <span x-text="selectedApp.lastUpdate"></span></span>
+                <div class="px-6 grid gap-3 mb-8">
+                    <div class="flex justify-between text-[9px] font-black opacity-40 uppercase border-b border-gray-500/10 pb-2">
+                        <span>Launch: <span x-text="selectedApp.releaseDate"></span></span>
+                        <span>Update: <span x-text="selectedApp.lastUpdate"></span></span>
                     </div>
                     <template x-for="v in selectedApp.versions">
-                        <div class="p-4 bg-gray-500/10 rounded-2xl flex justify-between items-center">
+                        <div class="p-4 card-bg rounded-[1.8rem] flex justify-between items-center">
                             <div>
-                                <p class="font-black text-sm" x-text="'v' + v.ver"></p>
-                                <p class="text-[10px] text-blue-500 font-black" x-text="v.size"></p>
+                                <p class="font-black text-sm" x-text="'Version ' + v.ver"></p>
+                                <p class="text-[10px] text-blue-500 font-black uppercase" x-text="v.size"></p>
                             </div>
-                            <a :href="v.url" class="px-8 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black shadow-lg">INSTALL</a>
+                            <a :href="v.url" class="px-8 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black shadow-lg shadow-blue-500/20">INSTALL</a>
                         </div>
                     </template>
                 </div>
 
-                <div class="px-6 mt-8">
-                    <div class="p-4 bg-blue-500/5 rounded-2xl border-l-4 border-blue-600">
-                        <h3 class="text-xs font-black text-blue-500 mb-2 uppercase italic">About this game</h3>
+                <div class="px-6">
+                    <div class="p-5 bg-blue-500/5 rounded-[2rem] border-l-4 border-blue-600">
+                        <h3 class="text-xs font-black text-blue-600 mb-2 uppercase italic">About this game</h3>
                         <p class="text-xs leading-relaxed font-semibold opacity-70" x-text="selectedApp.description"></p>
                     </div>
                 </div>
 
-                <div class="px-6 mt-10">
-                    <h3 class="font-black text-sm mb-4 uppercase">Recommended for you</h3>
+                <div class="px-6 mt-6 flex flex-wrap gap-2">
+                    <template x-for="kw in selectedApp.keywords">
+                        <span class="text-[9px] font-bold text-blue-500 bg-blue-500/10 px-3 py-1 rounded-full" x-text="'#'+kw"></span>
+                    </template>
+                </div>
+
+                <div class="px-6 mt-10" x-show="selectedApp.rec_ids && selectedApp.rec_ids.length > 0">
+                    <h3 class="font-black text-sm mb-4 uppercase opacity-50">Recommended</h3>
                     <div class="flex gap-4 overflow-x-auto no-scrollbar">
                         <template x-for="recId in selectedApp.rec_ids">
-                            <div @click="openDetail(getAppById(recId))" class="min-w-[80px] text-center">
-                                <img :src="getAppById(recId).icon" class="w-16 h-16 rounded-2xl mx-auto shadow-sm">
-                                <p class="text-[8px] mt-1 font-bold truncate" x-text="getAppById(recId).name"></p>
+                            <div @click="openDetail(getAppById(recId))" class="min-w-[90px] text-center">
+                                <img :src="getIcon(getAppById(recId).icon)" class="w-16 h-16 rounded-2xl mx-auto mb-1">
+                                <p class="text-[8px] font-bold truncate" x-text="getAppById(recId).name"></p>
                             </div>
                         </template>
                     </div>
@@ -125,9 +141,43 @@
         </template>
     </div>
 
-    <div class="fixed bottom-4 right-4 flex flex-col gap-2">
-        <button @click="darkMode = !darkMode" class="p-3 bg-blue-600 text-white rounded-full shadow-2xl">🌓</button>
-        <button @click="showSettings = true" class="p-3 bg-gray-800 text-white rounded-full shadow-2xl">📊</button>
+    <div x-show="showSettings" class="fixed inset-0 z-[200] flex items-end justify-center bg-black/80 backdrop-blur-sm p-4" x-transition>
+        <div @click.away="showSettings = false" class="bg-inherit w-full max-w-md rounded-[3rem] p-8 border border-gray-500/20 shadow-2xl">
+            <h2 class="text-2xl font-black mb-8 italic">Market Filters</h2>
+            
+            <div class="space-y-6">
+                <div class="p-4 card-bg rounded-2xl">
+                    <label class="text-[10px] font-black opacity-40 block mb-3 uppercase tracking-widest">Calendar Date Range</label>
+                    <div class="flex gap-4 items-center">
+                        <input type="date" x-model="dateStart" class="bg-transparent text-[10px] font-bold flex-1 outline-none">
+                        <span class="opacity-20">to</span>
+                        <input type="date" x-model="dateEnd" class="bg-transparent text-[10px] font-bold flex-1 outline-none">
+                    </div>
+                </div>
+
+                <div class="p-4 card-bg rounded-2xl">
+                    <label class="text-[10px] font-black opacity-40 block mb-2 uppercase tracking-widest">Sorting Options</label>
+                    <select x-model="sortBy" class="w-full bg-transparent font-black text-xs outline-none cursor-pointer">
+                        <option value="newest">Newest To Oldest</option>
+                        <option value="oldest">Oldest To Newest</option>
+                        <option value="size-desc">Highest Size To Lowest</option>
+                        <option value="size-asc">Lowest Size To Highest</option>
+                    </select>
+                </div>
+
+                <div @click="darkMode = !darkMode" class="p-5 card-bg rounded-2xl flex justify-between items-center cursor-pointer active:scale-95 transition-all">
+                    <div class="flex items-center gap-3">
+                        <span class="text-lg" x-text="darkMode ? '🌙' : '☀️'"></span>
+                        <span class="text-xs font-black uppercase tracking-widest" x-text="darkMode ? 'Dark Theme' : 'Light Theme'"></span>
+                    </div>
+                    <div class="w-10 h-5 bg-gray-500/20 rounded-full relative">
+                        <div class="absolute top-1 w-3 h-3 bg-blue-600 rounded-full transition-all" :class="darkMode ? 'right-1' : 'left-1'"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button @click="showSettings = false" class="w-full mt-8 py-5 bg-blue-600 text-white rounded-[1.8rem] font-black uppercase tracking-widest text-[10px]">Save & Apply Filters</button>
+        </div>
     </div>
 
     <script>
@@ -135,10 +185,13 @@
             return {
                 apps: [],
                 searchQuery: '',
-                darkMode: true,
+                darkMode: false, // Default: Light
                 viewingDetail: false,
                 selectedApp: null,
+                showSettings: false,
                 sortBy: 'newest',
+                dateStart: '',
+                dateEnd: '',
                 
                 async init() {
                     const res = await fetch('info.json');
@@ -147,60 +200,69 @@
                 },
 
                 isVideo(f) { return /\.(mp4|web4|webm)$/i.test(f); },
+                
+                getIcon(path) {
+                    if (!path || path === "N/A" || path === "null" || path.includes("FS")) {
+                        return `https://ui-avatars.com/api/?name=FS&background=0066FF&color=fff&size=512`;
+                    }
+                    return path;
+                },
+
+                hasMedia(app) {
+                    return app.assets && app.assets.screenshots && app.assets.screenshots.length > 0 && app.assets.screenshots[0] !== "N/A";
+                },
+
+                getAppById(id) { return this.apps.find(a => a.id === id) || { name: '...', icon: 'FS' }; },
 
                 shouldShowOffer() {
                     const q = this.searchQuery.toLowerCase();
-                    return q !== 'all' && q !== 'allgame' && q !== 'allapp';
+                    return !['all', 'allgame', 'allapp'].includes(q);
                 },
 
-                getOffer() { return this.apps.find(a => a.assets.video); },
-                getAppById(id) { return this.apps.find(a => a.id === id) || {}; },
+                getOffer() { return this.apps.find(a => a.assets && a.assets.video && a.assets.video !== "N/A"); },
 
                 get filteredApps() {
-                    const q = this.searchQuery.toLowerCase();
+                    let q = this.searchQuery.toLowerCase();
                     let list = this.apps;
 
-                    // 1. COMMAND SYSTEM
-                    if (q === 'all') return list;
-                    if (q === 'allgame') return list.filter(a => a.type === 'game');
-                    if (q === 'allapp') return list.filter(a => a.type === 'app');
-                    
-                    if (q.startsWith('pub:')) {
-                        const owner = q.split(':')[1];
-                        return list.filter(a => a.owner.toLowerCase().includes(owner));
-                    }
-                    if (q.startsWith('category:')) {
-                        const cat = q.split(':')[1];
-                        return list.filter(a => a.category.toLowerCase() === cat);
-                    }
-
-                    // 2. NORMAL SEARCH
-                    if (q.length > 0) {
+                    // 1. Search Commands
+                    if (q === 'all') list = this.apps;
+                    else if (q === 'allgame') list = list.filter(a => a.type === 'game');
+                    else if (q === 'allapp') list = list.filter(a => a.type === 'app');
+                    else if (q.startsWith('pub:')) list = list.filter(a => a.owner.toLowerCase().includes(q.split(':')[1]));
+                    else if (q.startsWith('category:')) list = list.filter(a => a.category.toLowerCase().includes(q.split(':')[1]));
+                    else if (q.length > 0) {
                         list = list.filter(a => a.name.toLowerCase().includes(q) || (a.keywords && a.keywords.some(k => k.toLowerCase().includes(q))));
                     }
 
-                    // 3. SIZE-AWARE SORTING (MB vs GB)
+                    // 2. Date Range Filter
+                    if (this.dateStart) list = list.filter(a => new Date(a.releaseDate) >= new Date(this.dateStart));
+                    if (this.dateEnd) list = list.filter(a => new Date(a.releaseDate) <= new Date(this.dateEnd));
+
+                    // 3. Smart Size Sorting (MB vs GB)
                     list.sort((a, b) => {
                         const parseSize = (app) => {
                             const s = app.versions[0]?.size || "0 MB";
-                            const match = s.match(/(\d+(\.\d+)?)\s*(MB|GB)/i);
-                            if (!match) return 0;
-                            let val = parseFloat(match[1]);
-                            return match[3].toUpperCase() === 'GB' ? val * 1024 : val;
+                            const m = s.match(/(\d+(\.\d+)?)\s*(MB|GB)/i);
+                            if (!m) return 0;
+                            let v = parseFloat(m[1]);
+                            return m[3].toUpperCase() === 'GB' ? v * 1024 : v;
                         };
 
                         if (this.sortBy === 'size-desc') return parseSize(b) - parseSize(a);
                         if (this.sortBy === 'size-asc') return parseSize(a) - parseSize(b);
                         if (this.sortBy === 'newest') return new Date(b.releaseDate) - new Date(a.releaseDate);
+                        if (this.sortBy === 'oldest') return new Date(a.releaseDate) - new Date(b.releaseDate);
                         return 0;
                     });
                     return list;
                 },
 
                 openDetail(app) { this.selectedApp = app; this.viewingDetail = true; window.scrollTo(0,0); },
-                resetAll() { this.searchQuery = ''; this.viewingDetail = false; }
+                resetAll() { this.searchQuery = ''; this.viewingDetail = false; this.dateStart = ''; this.dateEnd = ''; }
             }
         }
     </script>
 </body>
-</html>
+    </html>
+    
