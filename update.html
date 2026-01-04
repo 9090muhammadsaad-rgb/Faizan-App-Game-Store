@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Admin | Update Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --p-green: #01875f; --p-bg: #f8f9fa; --p-txt: #202124; --p-card: #ffffff; }
+        body { font-family: 'Google Sans', sans-serif; background: var(--p-bg); color: var(--p-txt); padding: 20px; }
+        .admin-card { background: var(--p-card); padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto 30px; }
+        h2 { color: var(--p-green); margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 500; margin-bottom: 5px; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; }
+        input:focus { border-color: var(--p-green); }
+
+        .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        button { padding: 12px 25px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-add { background: var(--p-green); color: white; flex: 1; }
+        .btn-copy { background: #1a73e8; color: white; }
+        .btn-dl { background: #3c4043; color: white; }
+        .btn-edit { background: #f29900; color: white; padding: 5px 10px; font-size: 12px; }
+
+        #output-area { position: relative; margin-top: 30px; }
+        #json-output { background: #272822; color: #f8f8f2; padding: 20px; border-radius: 10px; font-family: monospace; overflow-x: auto; white-space: pre-wrap; max-height: 400px; }
+
+        .app-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .v-row { display: flex; gap: 5px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-card">
+        <h2>📂 Step 1: Load Existing info.json</h2>
+        <input type="file" id="fileInput" accept=".json">
+        <p style="font-size: 12px; color: gray; margin-top: 5px;">Pehle apni purani file select karein taake data load ho jaye.</p>
+    </div>
+
+    <div class="admin-card">
+        <h2>➕ Step 2: Add / Edit Game</h2>
+        <div class="form-group">
+            <label>Game ID (Unique like 'pubg-01')</label>
+            <input type="text" id="g-id">
+        </div>
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="g-name">
+        </div>
+        <div class="form-group">
+            <label>Icon URL (e.g., photo.jpeg)</label>
+            <input type="text" id="g-icon">
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="g-desc" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <input type="text" id="g-cat" placeholder="Action, Simulation...">
+        </div>
+        <div class="form-group">
+            <label>Type</label>
+            <select id="g-type">
+                <option value="game">Game</option>
+                <option value="app">App</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Release Date</label>
+            <input type="date" id="g-date">
+        </div>
+
+        <div id="versions-container">
+            <label>Versions (Multiple)</label>
+            <div class="v-row">
+                <input type="text" class="v-ver" placeholder="Version (e.g 1.0)">
+                <input type="text" class="v-size" placeholder="Size (e.g 500 MB)">
+                <input type="text" class="v-url" placeholder="Link">
+            </div>
+        </div>
+        <button onclick="addVersionRow()" style="background:#eee; color:#333; margin-top:5px; padding:5px 10px;">+ Add Another Version</button>
+
+        <div class="btn-row">
+            <button class="btn-add" onclick="saveToDB()">💾 Save to List / Update</button>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <h2>📋 Current List (Search & Edit)</h2>
+        <input type="text" id="search" placeholder="Search by name..." oninput="renderList()">
+        <div id="list-container" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="admin-card" id="output-area">
+        <h2>🚀 Step 3: Export Updated info.json</h2>
+        <div class="btn-row" style="margin-bottom: 15px;">
+            <button class="btn-copy" onclick="copyCode()">📋 Copy Code</button>
+            <button class="btn-dl" onclick="downloadJSON()">📥 Download info.json</button>
+        </div>
+        <pre id="json-output">Code will appear here...</pre>
+    </div>
+
+    <script>
+        let fullData = { apps: [] };
+
+        // 1. Load File
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                fullData = JSON.parse(reader.result);
+                renderList();
+                updateOutput();
+            };
+            reader.readAsText(e.target.files[0]);
+        });
+
+        function addVersionRow() {
+            const div = document.createElement('div');
+            div.className = 'v-row';
+            div.innerHTML = `<input type="text" class="v-ver" placeholder="Ver"><input type="text" class="v-size" placeholder="Size"><input type="text" class="v-url" placeholder="Link">`;
+            document.getElementById('versions-container').appendChild(div);
+        }
+
+        // 2. Save / Add Logic
+        function saveToDB() {
+            const id = document.getElementById('g-id').value;
+            if(!id) return alert("ID is required!");
+
+            const vers = [];
+            const verInputs = document.querySelectorAll('.v-ver');
+            const sizeInputs = document.querySelectorAll('.v-size');
+            const urlInputs = document.querySelectorAll('.v-url');
+
+            verInputs.forEach((v, i) => {
+                if(v.value) vers.push({ ver: v.value, size: sizeInputs[i].value, url: urlInputs[i].value });
+            });
+
+            const newApp = {
+                id: id,
+                name: document.getElementById('g-name').value,
+                icon: document.getElementById('g-icon').value,
+                description: document.getElementById('g-desc').value,
+                category: document.getElementById('g-cat').value,
+                type: document.getElementById('g-type').value,
+                releaseDate: document.getElementById('g-date').value,
+                size: vers[0] ? vers[0].size : "0 MB",
+                versions: vers,
+                media: [] // Default empty
+            };
+
+            const index = fullData.apps.findIndex(a => a.id === id);
+            if(index > -1) fullData.apps[index] = newApp; // Edit
+            else fullData.apps.push(newApp); // Add New
+
+            renderList();
+            updateOutput();
+            alert("Saved Successfully!");
+        }
+
+        function renderList() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const container = document.getElementById('list-container');
+            container.innerHTML = "";
+            
+            fullData.apps.filter(a => a.name.toLowerCase().includes(search)).forEach(a => {
+                container.innerHTML += `
+                <div class="app-item">
+                    <span><b>${a.name}</b> (${a.id})</span>
+                    <button class="btn-edit" onclick="editApp('${a.id}')">Edit</button>
+                </div>`;
+            });
+        }
+
+        function editApp(id) {
+            const a = fullData.apps.find(x => x.id === id);
+            document.getElementById('g-id').value = a.id;
+            document.getElementById('g-name').value = a.name;
+            document.getElementById('g-icon').value = a.icon;
+            document.getElementById('g-desc').value = a.description;
+            document.getElementById('g-cat').value = a.category;
+            document.getElementById('g-type').value = a.type;
+            document.getElementById('g-date').value = a.releaseDate;
+            
+            // Reset and load versions
+            const container = document.getElementById('versions-container');
+            container.innerHTML = '<label>Versions</label>';
+            a.versions.forEach(v => {
+                const div = document.createElement('div');
+                div.className = 'v-row';
+                div.innerHTML = `<input type="text" class="v-ver" value="${v.ver}"><input type="text" class="v-size" value="${v.size}"><input type="text" class="v-url" value="${v.url}">`;
+                container.appendChild(div);
+            });
+        }
+
+        function updateOutput() {
+            document.getElementById('json-output').innerText = JSON.stringify(fullData, null, 2);
+        }
+
+        function copyCode() {
+            const code = document.getElementById('json-output').innerText;
+            navigator.clipboard.writeText(code);
+            alert("Code Copied!");
+        }
+
+        function downloadJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullData, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "info.json");
+            dlAnchorElem.click();
+        }
+    </script>
+</body>
+                  </html>
+                  
