@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faizan Store | Ultra Pro Store</title>
+    <title>Faizan Store | Pro Max</title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root { --p-green: #01875f; --p-bg: #ffffff; --p-txt: #202124; --p-border: #e8eaed; --p-surface: #f1f3f4; --p-active: #e6f4ea; --p-drawer: #ffffff; }
@@ -17,6 +17,13 @@
         .search-pill { flex: 1; display: flex; align-items: center; background: var(--p-surface); border-radius: 8px; padding: 0 12px; }
         .search-input { width: 100%; border: none; background: transparent; padding: 12px; font-size: 15px; outline: none; color: var(--p-txt); }
 
+        /* HERO TRENDING SECTION */
+        #hero-trending { padding: 80px 16px 0; display: none; }
+        .hero-banner { width: 100%; height: 200px; border-radius: 15px; background: #000; overflow: hidden; position: relative; cursor: pointer; border: 1px solid var(--p-border); }
+        .hero-banner video, .hero-banner img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        .hero-info { position: absolute; bottom: 0; left: 0; padding: 15px; color: white; background: linear-gradient(transparent, rgba(0,0,0,0.8)); width: 100%; }
+        .hero-tag { background: var(--p-green); color: white; font-size: 10px; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-weight: bold; }
+
         /* SETTINGS DRAWER */
         #drawer { position: fixed; top: 0; right: -100%; width: 300px; height: 100%; background: var(--p-drawer); z-index: 6000; padding: 25px; transition: 0.4s; box-shadow: -10px 0 30px rgba(0,0,0,0.2); overflow-y: auto; }
         #drawer.open { right: 0; }
@@ -25,7 +32,7 @@
         .drawer-btn { width: 100%; padding: 14px 10px; text-align: left; border: none; background: transparent; border-bottom: 1px solid var(--p-border); color: var(--p-txt); font-size: 15px; cursor: pointer; }
 
         /* GRID */
-        .container { padding: 80px 16px 120px; }
+        .container { padding: 20px 16px 120px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 18px; }
         .app-card { cursor: pointer; text-align: left; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -35,19 +42,16 @@
         /* DETAIL LAYOUT */
         #details { position: fixed; inset: 0; background: var(--p-bg); z-index: 5000; display: none; overflow-y: auto; }
         .d-header { position: sticky; top: 0; background: var(--p-bg); padding: 15px; border-bottom: 1px solid var(--p-border); z-index: 10; display: flex; align-items: center; }
-        
         .hero-section { padding: 20px; display: flex; align-items: center; gap: 20px; }
         .hero-section img { width: 90px; height: 90px; border-radius: 22%; border: 1px solid var(--p-border); }
         .hero-section h2 { font-size: 24px; font-weight: 700; }
 
-        /* NEW SPECS BOX */
         .specs-box { margin: 0 20px 20px; padding: 15px; background: var(--p-surface); border-radius: 12px; font-size: 13px; }
         .mod-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 11px; margin-bottom: 8px; }
         .badge-mod { background: #fce4ec; color: #d81b60; }
         .badge-orig { background: #e8f5e9; color: #2e7d32; }
 
         .desc-section { padding: 0 20px 20px; font-size: 14px; color: #5f6368; line-height: 1.6; }
-        
         .gallery { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
         .gallery::-webkit-scrollbar { display: none; }
         .gallery img, .gallery video { height: 180px; width: auto; min-width: 100px; border-radius: 12px; border: 1px solid var(--p-border); background: #eee; }
@@ -67,16 +71,18 @@
 
     <header id="main-header">
         <div class="search-pill">
-            <input type="text" id="search" class="search-input" placeholder="Search games...">
+            <input type="text" id="search" class="search-input" placeholder="Search by name or keywords...">
         </div>
         <div onclick="toggleDrawer(true)" style="cursor:pointer; font-size: 24px;">🔘</div>
     </header>
+
+    <div id="hero-trending"></div>
 
     <div class="overlay" id="overlay" onclick="toggleDrawer(false)"></div>
 
     <div id="drawer">
         <div style="font-size: 20px; font-weight: 700; color: var(--p-green); margin-bottom: 20px;">Settings</div>
-        <button class="drawer-btn" onclick="window.location.href='https://example.com/help'">❓ Help & Support</button>
+        <button class="drawer-btn" onclick="window.location.href='#'">❓ Help & Support</button>
         <button class="drawer-btn" onclick="sortData('size-h')">📈 Highest To Lowest Size</button>
         <button class="drawer-btn" onclick="sortData('size-l')">📉 Lowest To Highest Size</button>
         <button class="drawer-btn" onclick="sortData('date-n')">🆕 Newest To Oldest</button>
@@ -97,13 +103,10 @@
             <span id="d-nav-title" style="margin-left:20px; font-weight:700"></span>
         </div>
         <div id="d-hero"></div>
-        
         <div id="d-specs"></div>
-
         <div class="desc-section" id="d-desc"></div>
         <div class="gallery" id="d-gallery"></div>
         <div class="dl-section" id="d-versions"></div>
-        
         <div class="rec-section">
             <h4 style="margin-bottom:15px;">RECOMMENDED</h4>
             <div class="grid" id="d-recs" style="grid-template-columns: repeat(3, 1fr);"></div>
@@ -127,8 +130,32 @@
                 const data = await res.json();
                 db = data.apps;
                 currentList = [...db];
+                renderHero();
                 renderGrid(currentList);
-            } catch (e) { console.error("JSON Error: ", e); }
+            } catch (e) { console.error(e); }
+        }
+
+        // FEATURED TRENDING LOGIC
+        function renderHero() {
+            const trending = db.filter(a => a.isTrending);
+            if (trending.length > 0) {
+                const randomApp = trending[Math.floor(Math.random() * trending.length)];
+                const heroBox = document.getElementById('hero-trending');
+                const cover = (randomApp.media && randomApp.media[0]) ? randomApp.media[0] : randomApp.icon;
+                const isVideo = cover.endsWith('.mp4');
+
+                heroBox.innerHTML = `
+                    <div class="hero-banner" onclick="openDetails('${randomApp.id}')">
+                        ${isVideo ? `<video src="${cover}" autoplay muted loop></video>` : `<img src="${cover}">`}
+                        <div class="hero-info">
+                            <span class="hero-tag">Trending Now</span>
+                            <h3 style="margin-top:5px;">${randomApp.name}</h3>
+                            <p style="font-size:11px; opacity:0.8;">Explore and Download now</p>
+                        </div>
+                    </div>
+                `;
+                heroBox.style.display = 'block';
+            }
         }
 
         function renderGrid(list) {
@@ -146,7 +173,6 @@
             document.getElementById('d-nav-title').innerText = a.name;
             document.getElementById('d-hero').innerHTML = `<div class="hero-section"><img src="${a.icon}"><h2>${a.name}</h2></div>`;
             
-            // SHOW SPECS (Owner, SDK, MOD)
             const badgeClass = a.isMod ? 'badge-mod' : 'badge-orig';
             const badgeText = a.isMod ? 'MOD UNLOCKED' : 'OFFICIAL';
             
@@ -169,7 +195,7 @@
             if (a.media && a.media.length > 0) {
                 gal.innerHTML = a.media.map(m => {
                     const ext = m.split('.').pop().toLowerCase();
-                    if (['mp4', 'webm', 'mov'].includes(ext)) return `<video src="${m}" controls preload="metadata"></video>`;
+                    if (['mp4', 'webm'].includes(ext)) return `<video src="${m}" controls preload="metadata"></video>`;
                     return `<img src="${m}" onerror="this.style.display='none'">`;
                 }).join('');
                 gal.style.display = 'flex';
@@ -192,6 +218,19 @@
             document.body.style.overflow = 'hidden';
         }
 
+        // SEARCH WITH KEYWORDS
+        document.getElementById('search').addEventListener('input', e => {
+            const val = e.target.value.toLowerCase().trim();
+            if(!val) { renderGrid(currentList); return; }
+            
+            const filtered = db.filter(x => {
+                const name = x.name.toLowerCase();
+                const keys = (x.keywords || "").toLowerCase();
+                return name.includes(val) || keys.split(',').some(k => k.trim().includes(val));
+            });
+            renderGrid(filtered);
+        });
+
         function sortData(type) {
             let sorted = [...currentList];
             if (type === 'size-h') sorted.sort((a,b) => parseSize(b.size) - parseSize(a.size));
@@ -213,11 +252,6 @@
             currentList = (t === 'all') ? db : db.filter(x => x.type === t);
             renderGrid(currentList);
         }
-
-        document.getElementById('search').addEventListener('input', e => {
-            const val = e.target.value.toLowerCase();
-            renderGrid(db.filter(x => x.name.toLowerCase().includes(val)));
-        });
 
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
