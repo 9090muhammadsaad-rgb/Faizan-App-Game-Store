@@ -1,53 +1,38 @@
 {
   "apps": [
     {
-      "id": "1",
-      "name": "PUBG Mobile",
+      "id": "g1",
+      "name": "GTA 5 Mobile",
       "type": "game",
       "category": "Action",
-      "icon": "https://www.pubgmobile.com/common/images/icon_logo.jpg",
-      "size": "1.2 GB",
-      "releaseDate": "2023-12-01",
-      "description": "The original battle royale, now on mobile with high quality graphics.",
+      "size": "2.4 GB",
+      "releaseDate": "2026-01-01",
+      "icon": "icon.png",
+      "description": "High graphics action game for all Android devices. Experience the open world like never before.",
       "media": [
-        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJtZ3R6Zzh6bmh6bmh6bmh6bmh6bmh6bmh6bmh6bmh6bmh6bmh6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l41lTjJp9p6p5v5YQ/giphy.gif",
-        "https://files.testfile.org/video/video.mp4"
+        "shot1.jpeg",
+        "shot2.jpg",
+        "shot3.png",
+        "shot4.webp",
+        "video.mp4"
       ],
       "versions": [
-        { "ver": "2.9.0", "size": "1.2 GB", "url": "#" }
+        { "ver": "v1.5 Premium", "size": "2.4 GB", "url": "https://example.com/gta.apk" },
+        { "ver": "v1.2 Lite", "size": "800 MB", "url": "https://example.com/gta_lite.apk" }
       ]
     },
     {
-      "id": "2",
-      "name": "WhatsApp Messenger",
+      "id": "a1",
+      "name": "Photoshop Mod",
       "type": "app",
-      "category": "Social",
-      "icon": "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg",
-      "size": "45 MB",
-      "releaseDate": "2024-01-01",
-      "description": "Simple, reliable, and private messaging and calling.",
-      "media": [
-        "https://www.gstatic.com/webp/gallery/1.webp",
-        "https://www.gstatic.com/webp/gallery/2.webp"
-      ],
+      "category": "Editing",
+      "size": "150 MB",
+      "releaseDate": "2025-12-15",
+      "icon": "photo.jpeg",
+      "description": "Professional photo editing with all filters unlocked.",
+      "media": [],
       "versions": [
-        { "ver": "2.24.1", "size": "45 MB", "url": "#" }
-      ]
-    },
-    {
-      "id": "3",
-      "name": "Sample Video App",
-      "type": "app",
-      "category": "Tools",
-      "icon": "https://www.gstatic.com/webp/gallery/4.sm.webp",
-      "size": "10 MB",
-      "releaseDate": "2024-01-03",
-      "description": "This app tests video support in the gallery.",
-      "media": [
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-      ],
-      "versions": [
-        { "ver": "1.0.0", "size": "10 MB", "url": "#" }
+        { "ver": "2025.1", "size": "150 MB", "url": "#" }
       ]
     }
   ]
