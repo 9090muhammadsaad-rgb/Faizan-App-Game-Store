@@ -1,24 +1,17 @@
 {
-  "trending_ids": ["g1"],
+  "trending_ids": ["g1", "g2"],
   "apps": [
     {
-      "id": "g1",
-      "name": "PUBG Mobile",
-      "package": "com.tencent.ig",
-      "owner": "Tencent",
-      "type": "game",
-      "category": "Action",
-      "isNew": true,
-      "releaseDate": "2026-01-01",
-      "icon": "%%FS",
-      "assets": {
-        "screenshots": ["vid.mp4", "img1.jpg"],
-        "video": "vid.mp4"
-      },
-      "versions": [
-        {"ver": "3.5.0", "url": "#", "size": "1.2 GB"},
-        {"ver": "3.4.0", "url": "#", "size": "1.1 GB"}
-      ]
-    }
+      "id": "g1", "name": "Cyber Racer", "package": "com.faizan.race", "owner": "Garena", "type": "game", "category": "Racing", "isNew": true, "releaseDate": "2025-12-01", "lastUpdate": "2026-01-02", "description": "High speed racing.", "icon": "icons/race.webp", "assets": {"screenshots": ["ss/r1.mp4", "ss/r2.jpg"]},
+      "versions": [{"ver": "1.0", "url": "dl/r1.apk", "size": "1.2 GB"}], "keywords": ["car", "fast"], "rec_ids": ["g2", "g3"]
+    },
+    {
+      "id": "g2", "name": "Shadow Fight", "package": "com.faizan.shadow", "owner": "Nekki", "type": "game", "category": "Action", "isNew": false, "releaseDate": "2025-11-10", "lastUpdate": "2025-12-25", "description": "Ninja battle.", "icon": "icons/ninja.png", "assets": {"screenshots": ["ss/n1.jpg"]},
+      "versions": [{"ver": "2.1", "url": "#", "size": "450 MB"}], "keywords": ["ninja", "fight"], "rec_ids": ["g1", "g4"]
+    },
+    { "id": "g3", "name": "Pixel Craft", "package": "com.faizan.pixel", "owner": "Mojang", "type": "game", "category": "Creative", "isNew": true, "releaseDate": "2026-01-01", "lastUpdate": "2026-01-03", "description": "Build worlds.", "icon": "icons/pixel.jpg", "assets": {"screenshots": []}, "versions": [{"ver": "1.0", "url": "#", "size": "300 MB"}], "keywords": ["blocks"], "rec_ids": ["g1"] },
+    { "id": "g4", "name": "Total Editor", "package": "com.faizan.edit", "owner": "Adobe", "type": "app", "category": "Editing", "isNew": false, "releaseDate": "2025-05-01", "lastUpdate": "2025-12-01", "description": "Edit photos.", "icon": "icons/edit.png", "assets": {"screenshots": []}, "versions": [{"ver": "5.0", "url": "#", "size": "85 MB"}], "keywords": ["photo"], "rec_ids": [] }
+    /* ... Add 6 more similar entries to reach 10 ... */
   ]
 }
+  
