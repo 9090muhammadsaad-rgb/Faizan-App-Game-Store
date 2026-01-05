@@ -5,26 +5,24 @@
       "isTrending": true,
       "type": "game",
       "name": "Minecraft - MOD",
-      "category": "minecraft، survival",
-      "keywords": "minecraft , Minecraft , mojang , mincraft ",
-      "releaseDate": "",
+      "category": "survival",
+      "keywords": "minecraft, mojang, craft",
+      "releaseDate": "2026-01-01",
       "uploadedDate": "2026-01-05",
-      "lastUpdate": "",
+      "lastUpdate": "2026-01-05",
       "icon": "icons/minecraft_icon.jpg",
-      "size": "Default",
+      "size": "885MB",
+      "description": "Minecraft is a game about placing blocks and going on adventures.",
       "manualRecs": [],
       "media": [
-        "assets/minecraft/minecraft_screenshot1.jpg",
-        "assets/minecraft/minecraft_screenshot2.jpg",
-        "assets/minecraft/minecraft_screenshot4.jpg",
-        "assets/minecraft/minecraft_screenshot5.jpg",
-        "assets/minecraft/minecraft_screenshot3.jpg"
+        "assets/minecraft/1.jpg",
+        "assets/minecraft/2.jpg"
       ],
       "versions": [
         {
-          "ver": "Default",
-          "size": "885.4MB",
-          "url": ""
+          "ver": "1.20",
+          "size": "885MB",
+          "url": "https://download-link.com"
         }
       ]
     }
