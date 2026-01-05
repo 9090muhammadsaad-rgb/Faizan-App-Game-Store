@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Admin | Full Version</title>
+    <title>Store Admin | Pro Full Logic</title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root { --p-green: #01875f; --p-bg: #ffffff; --p-txt: #202124; --p-border: #e8eaed; --p-surface: #f1f3f4; }
-        body { background: var(--p-bg); color: var(--p-txt); font-family: 'Google Sans', sans-serif; padding-bottom: 120px; }
+        body { background: var(--p-bg); color: var(--p-txt); font-family: 'Google Sans', sans-serif; padding-bottom: 150px; }
         header { position: fixed; top: 0; width: 100%; background: var(--p-bg); z-index: 1000; padding: 12px 16px; border-bottom: 1px solid var(--p-border); display: flex; align-items: center; gap: 10px; }
         .container { padding: 80px 16px 20px; }
         
@@ -22,6 +22,13 @@
         .trending-row { background: #fffde7; border: 2px dashed #fbc02d; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .date-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         
+        /* Icon Previewer Styles */
+        .icon-preview-box { display: flex; align-items: center; gap: 15px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #ddd; margin-top: 5px; }
+        .icon-preview-box img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #eee; border: 1px solid #ccc; }
+        .status-badge { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
+        .status-ok { background: #e6f4ea; color: #1e8e3e; }
+        .status-err { background: #fce8e6; color: #d93025; }
+
         .recs-visual-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 10px; max-height: 180px; overflow-y: auto; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
         .rec-item { cursor: pointer; border: 2px solid transparent; border-radius: 10px; position: relative; }
         .rec-item.selected { border-color: var(--p-green); background: #e6f4ea; }
@@ -29,24 +36,29 @@
         .rec-item .check { position: absolute; top: -5px; right: -5px; background: var(--p-green); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; display: none; text-align: center; line-height: 18px; }
         .rec-item.selected .check { display: block; }
 
-        .btn-plus { background: var(--p-green); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .btn-plus { background: var(--p-green); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-plus:active { transform: scale(0.95); }
         .btn-red { background: #d93025; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 10px; }
         .item-row { background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 8px; }
+        
+        #save-status-msg { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; display: none; z-index: 6000; }
     </style>
 </head>
 <body>
 
     <header>
-        <input type="text" id="search" placeholder="Search to edit..." style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;" oninput="renderAdminGrid()">
+        <input type="text" id="search" placeholder="Search to edit/manage..." style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;" oninput="renderAdminGrid()">
         <button onclick="openEditor()" class="btn-plus" style="width:45px; height:45px; border-radius:50%; font-size:24px;">+</button>
     </header>
+
+    <div id="save-status-msg"></div>
 
     <div class="container"><div id="admin-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:15px;"></div></div>
 
     <div id="editor-modal">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 id="m-title" style="color:var(--p-green);">Manage Content</h2>
-            <button onclick="closeEditor()" style="font-size:30px; border:none; background:none; cursor:pointer;">&times;</button>
+            <h2 id="m-title" style="color:var(--p-green);">Database Editor</h2>
+            <button onclick="closeEditor()" style="font-size:35px; border:none; background:none; cursor:pointer;">&times;</button>
         </div>
 
         <input type="hidden" id="edit-index">
@@ -58,47 +70,63 @@
 
         <div class="section">
             <span class="section-h">1. Identity & Keywords</span>
-            <div class="field"><label>Unique ID</label><input type="text" id="f-id" oninput="validateID()"></div>
-            <div id="id-error" style="color:red; font-size:10px; display:none; margin-bottom:10px;">ID already exists!</div>
-            <div class="field"><label>Type</label><select id="f-type"><option value="game">Game</option><option value="app">App</option></select></div>
-            <div class="field"><label>Name</label><input type="text" id="f-name"></div>
-            <div class="field"><label>Category</label><input type="text" id="f-cat" placeholder="Action, Tools, etc."></div>
-            <div class="field"><label>Keywords (comma separated)</label><input type="text" id="f-keys"></div>
+            <div class="field"><label>Unique ID (Manual)</label><input type="text" id="f-id" placeholder="game-id-here" oninput="validateID()"></div>
+            <div id="id-error" style="color:red; font-size:10px; display:none; margin-bottom:10px; font-weight:bold;">⚠️ Error: ID already exists!</div>
+            <div class="field">
+                <label>Content Type</label>
+                <select id="f-type">
+                    <option value="game">Game</option>
+                    <option value="app">App</option>
+                </select>
+            </div>
+            <div class="field"><label>App Name</label><input type="text" id="f-name"></div>
+            <div class="field"><label>Category</label><input type="text" id="f-cat" placeholder="Action, Adventure, Tools"></div>
+            <div class="field"><label>Keywords (comma separated for search feature)</label><input type="text" id="f-keys" placeholder="ninja, mod, battle, racing"></div>
         </div>
 
         <div class="section">
             <span class="section-h">2. Timeline (Dates)</span>
             <div class="date-grid">
-                <div class="field"><label>Release</label><input type="date" id="f-release"></div>
-                <div class="field"><label>Uploaded</label><input type="date" id="f-upload"></div>
+                <div class="field"><label>Release Date</label><input type="date" id="f-release"></div>
+                <div class="field"><label>Uploaded Date</label><input type="date" id="f-upload"></div>
                 <div class="field"><label>Last Update</label><input type="date" id="f-last"></div>
             </div>
         </div>
 
         <div class="section">
-            <span class="section-h">3. Visual Recommendations</span>
-            <div class="field"><label>Selected IDs</label><input type="text" id="f-recs" oninput="syncVisualRecs()"></div>
+            <span class="section-h">3. Visual Recommendations (Tick to select)</span>
+            <div class="field"><label>Selected IDs (Manual/Auto)</label><input type="text" id="f-recs" oninput="syncVisualRecs()"></div>
             <div class="recs-visual-box" id="visual-recs-grid"></div>
         </div>
 
         <div class="section">
-            <span class="section-h">4. Media & Size</span>
-            <div class="field"><label>Icon Path</label><input type="text" id="f-icon"></div>
-            <div class="field"><label>Total App Size</label><input type="text" id="f-size" placeholder="150 MB"></div>
+            <span class="section-h">4. Assets & Icons</span>
+            <div class="field">
+                <label>Icon Path</label>
+                <input type="text" id="f-icon" oninput="checkIconPath(this.value)" placeholder="icons/myicon.png">
+                <div class="icon-preview-box">
+                    <img id="icon-preview" src="" onerror="this.src='https://via.placeholder.com/50?text=ERR'">
+                    <div>
+                        <div id="icon-status-text" style="font-size:11px; font-weight:bold;">No Icon Detected</div>
+                        <span id="icon-status-badge" class="status-badge status-err">UNVERIFIED</span>
+                    </div>
+                </div>
+            </div>
+            <div class="field"><label>Total App Size</label><input type="text" id="f-size" placeholder="100 MB"></div>
             <div id="media-container"></div>
-            <button class="btn-plus" style="font-size:10px; padding:5px 10px;" onclick="addMediaRow()">+ Add Screen/Video</button>
+            <button class="btn-plus" style="font-size:10px; padding:6px 12px; margin-top:5px;" onclick="addMediaRow()">+ Add Screen/Video Path</button>
         </div>
 
         <div class="section">
-            <span class="section-h">5. Download Versions</span>
+            <span class="section-h">5. Download Version Control</span>
             <div id="v-container"></div>
-            <button class="btn-plus" style="font-size:10px; padding:5px 10px;" onclick="addVersionRow()">+ Add New Version</button>
+            <button class="btn-plus" style="font-size:10px; padding:6px 12px;" onclick="addVersionRow()">+ Add New Version Group</button>
         </div>
 
-        <button id="main-save-btn" class="btn-plus" style="width:100%; padding:18px;" onclick="saveAll()">SAVE TO DATABASE</button>
+        <button id="main-save-btn" class="btn-plus" style="width:100%; padding:20px; font-size:16px; margin-top:10px;" onclick="preSaveCheck()">SAVE TO DATABASE</button>
     </div>
 
-    <div style="position:fixed; bottom:0; width:100%; background:#eee; padding:15px; display:flex; gap:10px;">
+    <div style="position:fixed; bottom:0; width:100%; background:#f1f3f4; padding:15px; display:flex; gap:10px; border-top:1px solid #ddd; z-index:4000;">
         <button class="btn-plus" style="flex:1" onclick="copyJSON()">📋 Copy JSON</button>
         <button class="btn-plus" style="flex:1; background:#1a73e8;" onclick="downloadJSON()">📥 Download info.json</button>
     </div>
@@ -106,20 +134,50 @@
     <script>
         let db = [];
         let selectedRecs = [];
+        let isIconValid = false;
 
         async function init() {
-            try { const res = await fetch('info.json'); const d = await res.json(); db = d.apps; renderAdminGrid(); } catch(e) {}
+            try { 
+                const res = await fetch('info.json'); 
+                const d = await res.json(); 
+                db = d.apps; 
+                renderAdminGrid(); 
+            } catch(e) { console.warn("New Database Mode"); }
+        }
+
+        function checkIconPath(path) {
+            const img = document.getElementById('icon-preview');
+            const badge = document.getElementById('icon-status-badge');
+            const text = document.getElementById('icon-status-text');
+            
+            if(!path) {
+                img.src = ""; text.innerText = "No Path Entered";
+                badge.className = "status-badge status-err"; badge.innerText = "EMPTY";
+                isIconValid = false; return;
+            }
+
+            img.onload = () => {
+                badge.className = "status-badge status-ok"; badge.innerText = "PATH VALID";
+                text.innerText = "Icon Loaded Successfully";
+                isIconValid = true;
+            };
+            img.onerror = () => {
+                badge.className = "status-badge status-err"; badge.innerText = "FILE NOT FOUND";
+                text.innerText = "Path seems broken!";
+                isIconValid = false;
+            };
+            img.src = path;
         }
 
         function renderAdminGrid() {
             const q = document.getElementById('search').value.toLowerCase();
             document.getElementById('admin-grid').innerHTML = db.filter(a => a.name.toLowerCase().includes(q)).map((a, i) => `
                 <div style="background:var(--p-surface); border-radius:15px; padding:10px; text-align:center; border:1px solid var(--p-border);">
-                    <img src="${a.icon}" style="width:100%; aspect-ratio:1/1; border-radius:12px; object-fit:cover;">
-                    <div style="font-size:12px; margin:8px 0; font-weight:bold; height:30px; overflow:hidden;">${a.name}</div>
+                    <img src="${a.icon}" style="width:100%; aspect-ratio:1/1; border-radius:12px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/150?text=Error'">
+                    <div style="font-size:12px; margin:8px 0; font-weight:bold; height:32px; overflow:hidden;">${a.name}</div>
                     <div style="display:flex; gap:5px;">
-                        <button onclick="openEditor(${i})" style="flex:1; background:#1a73e8; color:white; border:none; padding:5px; border-radius:5px; font-size:10px;">Edit</button>
-                        <button onclick="deleteApp(${i})" style="flex:1; background:#d93025; color:white; border:none; padding:5px; border-radius:5px; font-size:10px;">Del</button>
+                        <button onclick="openEditor(${i})" style="flex:1; background:#1a73e8; color:white; border:none; padding:6px; border-radius:6px; font-size:10px; cursor:pointer;">Edit</button>
+                        <button onclick="deleteApp(${i})" style="flex:1; background:#d93025; color:white; border:none; padding:6px; border-radius:6px; font-size:10px; cursor:pointer;">Del</button>
                     </div>
                 </div>
             `).join('');
@@ -134,7 +192,7 @@
             const currentID = idx > -1 ? db[idx].id : "";
             document.getElementById('visual-recs-grid').innerHTML = db.filter(a => a.id !== currentID).map(a => `
                 <div class="rec-item" id="vis-${a.id}" onclick="toggleRec('${a.id}')">
-                    <img src="${a.icon}"><div class="check">✓</div>
+                    <img src="${a.icon}" onerror="this.src='https://via.placeholder.com/80'"><div class="check">✓</div>
                 </div>
             `).join('');
 
@@ -151,6 +209,7 @@
                 document.getElementById('f-last').value = a.lastUpdate || "";
                 document.getElementById('f-icon').value = a.icon;
                 document.getElementById('f-size').value = a.size || "";
+                checkIconPath(a.icon);
                 selectedRecs = a.manualRecs || [];
                 document.getElementById('f-recs').value = selectedRecs.join(', ');
                 syncVisualRecs();
@@ -159,6 +218,7 @@
             } else {
                 document.getElementById('f-id').value = "id-" + Date.now();
                 document.getElementById('f-upload').value = new Date().toISOString().split('T')[0];
+                checkIconPath("");
                 addVersionRow();
             }
             validateID();
@@ -183,8 +243,9 @@
 
         function addMediaRow(val = "") {
             const div = document.createElement('div');
-            div.style = "display:flex; gap:5px; margin-bottom:5px;";
-            div.innerHTML = `<input type="text" class="m-path" value="${val}" style="flex:1"> <button class="btn-red" onclick="this.parentElement.remove()">X</button>`;
+            div.className = "item-row";
+            div.style.display = "flex"; div.style.gap = "5px";
+            div.innerHTML = `<input type="text" class="m-path" value="${val}" style="flex:1" placeholder="assets/screen.jpg"> <button class="btn-red" onclick="this.parentElement.remove()">X</button>`;
             document.getElementById('media-container').appendChild(div);
         }
 
@@ -193,11 +254,11 @@
             div.className = "item-row";
             div.innerHTML = `
                 <div style="display:flex; gap:5px; margin-bottom:5px;">
-                    <input type="text" class="v-ver" placeholder="Ver" value="${v}" style="width:30%">
-                    <input type="text" class="v-size" placeholder="Size" value="${s}" style="width:30%">
-                    <button class="btn-red" onclick="this.parentElement.parentElement.remove()">Del</button>
+                    <input type="text" class="v-ver" placeholder="Version (1.0)" value="${v}" style="width:30%">
+                    <input type="text" class="v-size" placeholder="Size (50MB)" value="${s}" style="width:30%">
+                    <button class="btn-red" onclick="this.parentElement.parentElement.remove()">Remove</button>
                 </div>
-                <input type="text" class="v-url" placeholder="Download URL" value="${u}">
+                <input type="text" class="v-url" placeholder="Direct Download Link" value="${u}">
             `;
             document.getElementById('v-container').appendChild(div);
         }
@@ -207,6 +268,14 @@
             const exists = db.some((app, i) => app.id === input.value && i != document.getElementById('edit-index').value);
             document.getElementById('id-error').style.display = exists ? 'block' : 'none';
             document.getElementById('main-save-btn').disabled = exists;
+            document.getElementById('main-save-btn').style.opacity = exists ? "0.5" : "1";
+        }
+
+        function preSaveCheck() {
+            if(!isIconValid) {
+                if(!confirm("⚠️ ICON ERROR: System couldn't find the icon image. Save anyway?")) return;
+            }
+            saveAll();
         }
 
         function saveAll() {
@@ -231,13 +300,22 @@
                     url: document.querySelectorAll('.v-url')[i].value
                 })).filter(v => v.ver)
             };
+            
             if(idx > -1) db[idx] = obj; else db.push(obj);
+            
+            showToast("Saved Successfully!");
             closeEditor(); renderAdminGrid();
         }
 
-        function deleteApp(i) { if(confirm("Delete?")) { db.splice(i, 1); renderAdminGrid(); } }
+        function showToast(msg) {
+            const t = document.getElementById('save-status-msg');
+            t.innerText = msg; t.style.display = "block";
+            setTimeout(() => t.style.display = "none", 3000);
+        }
+
+        function deleteApp(i) { if(confirm("Are you sure you want to delete this content?")) { db.splice(i, 1); renderAdminGrid(); } }
         function closeEditor() { document.getElementById('editor-modal').style.display = 'none'; }
-        function copyJSON() { navigator.clipboard.writeText(JSON.stringify({apps:db}, null, 2)); alert("JSON Copied!"); }
+        function copyJSON() { navigator.clipboard.writeText(JSON.stringify({apps:db}, null, 2)); alert("JSON Copied to Clipboard!"); }
         function downloadJSON() {
             const blob = new Blob([JSON.stringify({apps:db}, null, 2)], {type: "application/json"});
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "info.json"; a.click();
