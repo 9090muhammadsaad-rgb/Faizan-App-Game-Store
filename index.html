@@ -17,29 +17,28 @@
         .search-pill { flex: 1; display: flex; align-items: center; background: var(--p-surface); border-radius: 8px; padding: 0 12px; }
         .search-input { width: 100%; border: none; background: transparent; padding: 12px; font-size: 15px; outline: none; color: var(--p-txt); }
 
-        /* HERO TRENDING SECTION */
         #hero-trending { padding: 80px 16px 0; display: none; }
         .hero-banner { width: 100%; height: 200px; border-radius: 15px; background: #000; overflow: hidden; position: relative; cursor: pointer; border: 1px solid var(--p-border); }
         .hero-banner video, .hero-banner img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
         .hero-info { position: absolute; bottom: 0; left: 0; padding: 15px; color: white; background: linear-gradient(transparent, rgba(0,0,0,0.8)); width: 100%; }
         .hero-tag { background: var(--p-green); color: white; font-size: 10px; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-weight: bold; }
 
-        /* SETTINGS DRAWER */
         #drawer { position: fixed; top: 0; right: -100%; width: 300px; height: 100%; background: var(--p-drawer); z-index: 6000; padding: 25px; transition: 0.4s; box-shadow: -10px 0 30px rgba(0,0,0,0.2); overflow-y: auto; }
         #drawer.open { right: 0; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 5500; display: none; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
         .drawer-btn { width: 100%; padding: 14px 10px; text-align: left; border: none; background: transparent; border-bottom: 1px solid var(--p-border); color: var(--p-txt); font-size: 15px; cursor: pointer; }
 
-        /* GRID */
         .container { padding: 20px 16px 120px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 18px; }
-        .app-card { cursor: pointer; text-align: left; animation: fadeIn 0.4s ease; }
+        .app-card { cursor: pointer; text-align: left; animation: fadeIn 0.4s ease; position: relative; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .app-card img { width: 100%; aspect-ratio: 1/1; border-radius: 22%; object-fit: cover; border: 1px solid var(--p-border); }
         .app-name { font-size: 12px; font-weight: 500; margin-top: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        /* New Badge Style */
+        .new-badge { position: absolute; top: 5px; left: 5px; background: #d93025; color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; z-index: 5; }
 
-        /* DETAIL LAYOUT */
         #details { position: fixed; inset: 0; background: var(--p-bg); z-index: 5000; display: none; overflow-y: auto; }
         .d-header { position: sticky; top: 0; background: var(--p-bg); padding: 15px; border-bottom: 1px solid var(--p-border); z-index: 10; display: flex; align-items: center; }
         .hero-section { padding: 20px; display: flex; align-items: center; gap: 20px; }
@@ -51,7 +50,6 @@
         .badge-mod { background: #fce4ec; color: #d81b60; }
         .badge-orig { background: #e8f5e9; color: #2e7d32; }
 
-        .desc-section { padding: 0 20px 20px; font-size: 14px; color: #5f6368; line-height: 1.6; }
         .gallery { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
         .gallery::-webkit-scrollbar { display: none; }
         .gallery img, .gallery video { height: 180px; width: auto; min-width: 100px; border-radius: 12px; border: 1px solid var(--p-border); background: #eee; }
@@ -104,7 +102,6 @@
         </div>
         <div id="d-hero"></div>
         <div id="d-specs"></div>
-        <div class="desc-section" id="d-desc"></div>
         <div class="gallery" id="d-gallery"></div>
         <div class="dl-section" id="d-versions"></div>
         <div class="rec-section">
@@ -135,7 +132,6 @@
             } catch (e) { console.error(e); }
         }
 
-        // FEATURED TRENDING LOGIC
         function renderHero() {
             const trending = db.filter(a => a.isTrending);
             if (trending.length > 0) {
@@ -161,9 +157,10 @@
         function renderGrid(list) {
             document.getElementById('main-grid').innerHTML = list.map(a => `
                 <div class="app-card" onclick="openDetails('${a.id}')">
+                    ${a.isNew ? `<div class="new-badge">New</div>` : ''}
                     <img src="${a.icon}" onerror="this.src='https://via.placeholder.com/150'">
                     <div class="app-name">${a.name}</div>
-                    <div style="font-size:10px; color:gray;">${a.size} • ${a.releaseDate}</div>
+                    <div style="font-size:10px; color:gray;">${a.size} • ${a.releaseDate || a.uploadedDate}</div>
                 </div>
             `).join('');
         }
@@ -173,24 +170,23 @@
             document.getElementById('d-nav-title').innerText = a.name;
             document.getElementById('d-hero').innerHTML = `<div class="hero-section"><img src="${a.icon}"><h2>${a.name}</h2></div>`;
             
-            const badgeClass = a.isMod ? 'badge-mod' : 'badge-orig';
-            const badgeText = a.isMod ? 'MOD UNLOCKED' : 'OFFICIAL';
+            const isMod = a.name.toLowerCase().includes('mod');
+            const badgeClass = isMod ? 'badge-mod' : 'badge-orig';
+            const badgeText = isMod ? 'MOD UNLOCKED' : 'OFFICIAL';
             
             document.getElementById('d-specs').innerHTML = `
                 <div class="specs-box">
                     <div class="mod-badge ${badgeClass}">${badgeText}</div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span><b>Dev:</b> ${a.ownerName || 'Unknown'}</span>
-                        <span><b>Min SDK:</b> ${a.minSdk || '21'}+</span>
+                        <span><b>Type:</b> ${a.type.toUpperCase()}</span>
+                        <span><b>Category:</b> ${a.category || 'N/A'}</span>
                     </div>
                     <div style="font-size:11px; color:gray;">
-                        Release: ${a.releaseDate} | Updated: ${a.lastUpdate || a.releaseDate}
+                        Release: ${a.releaseDate || 'N/A'} | Updated: ${a.lastUpdate || a.uploadedDate}
                     </div>
                 </div>
             `;
 
-            document.getElementById('d-desc').innerHTML = `(( ${a.description} ))`;
-            
             const gal = document.getElementById('d-gallery');
             if (a.media && a.media.length > 0) {
                 gal.innerHTML = a.media.map(m => {
@@ -218,15 +214,13 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // SEARCH WITH KEYWORDS
         document.getElementById('search').addEventListener('input', e => {
             const val = e.target.value.toLowerCase().trim();
             if(!val) { renderGrid(currentList); return; }
-            
             const filtered = db.filter(x => {
                 const name = x.name.toLowerCase();
                 const keys = (x.keywords || "").toLowerCase();
-                return name.includes(val) || keys.split(',').some(k => k.trim().includes(val));
+                return name.includes(val) || keys.includes(val);
             });
             renderGrid(filtered);
         });
@@ -235,13 +229,13 @@
             let sorted = [...currentList];
             if (type === 'size-h') sorted.sort((a,b) => parseSize(b.size) - parseSize(a.size));
             if (type === 'size-l') sorted.sort((a,b) => parseSize(a.size) - parseSize(b.size));
-            if (type === 'date-n') sorted.sort((a,b) => new Date(b.releaseDate) - new Date(a.releaseDate));
-            if (type === 'date-o') sorted.sort((a,b) => new Date(a.releaseDate) - new Date(b.releaseDate));
+            if (type === 'date-n') sorted.sort((a,b) => new Date(b.uploadedDate || b.releaseDate) - new Date(a.uploadedDate || a.releaseDate));
+            if (type === 'date-o') sorted.sort((a,b) => new Date(a.uploadedDate || a.releaseDate) - new Date(b.uploadedDate || b.releaseDate));
             if (type === 'default') sorted = [...db];
             renderGrid(sorted); toggleDrawer(false);
         }
 
-        function parseSize(s) { let n = parseFloat(s); if(s.toUpperCase().includes('GB')) n *= 1024; return n; }
+        function parseSize(s) { let n = parseFloat(s); if(s.toUpperCase().includes('GB')) n *= 1024; return n || 0; }
         function toggleDrawer(s) { document.getElementById('drawer').classList.toggle('open', s); document.getElementById('overlay').classList.toggle('active', s); }
         function setTheme(t) { document.body.setAttribute('data-theme', t); toggleDrawer(false); }
         function closeDetails() { document.getElementById('details').style.display = 'none'; document.body.style.overflow = 'auto'; }
@@ -264,4 +258,5 @@
         init();
     </script>
 </body>
-</html>
+    </html>
+    
