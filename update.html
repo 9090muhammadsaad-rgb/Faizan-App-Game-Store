@@ -10,54 +10,44 @@
         body { background: var(--p-bg); color: var(--p-txt); font-family: 'Google Sans', sans-serif; padding-bottom: 150px; }
         header { position: fixed; top: 0; width: 100%; background: var(--p-bg); z-index: 1000; padding: 12px 16px; border-bottom: 1px solid var(--p-border); display: flex; align-items: center; gap: 10px; }
         .container { padding: 80px 16px 20px; }
-        
         #editor-modal { position: fixed; inset: 0; background: var(--p-bg); z-index: 5000; display: none; overflow-y: auto; padding: 20px; }
         .section { background: var(--p-surface); padding: 18px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--p-border); }
         .section-h { color: var(--p-green); font-weight: bold; font-size: 13px; margin-bottom: 15px; display: block; border-bottom: 2px solid #ddd; padding-bottom: 5px; text-transform: uppercase; }
-        
         .field { margin-bottom: 12px; }
         .field label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #444; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--p-border); border-radius: 8px; outline: none; font-size: 14px; background: white; }
-        
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--p-border); border-radius: 8px; outline: none; font-size: 14px; background: white; box-sizing: border-box; }
         .trending-row { background: #fffde7; border: 2px dashed #fbc02d; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .date-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        
-        /* Icon Previewer Styles */
         .icon-preview-box { display: flex; align-items: center; gap: 15px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #ddd; margin-top: 5px; }
-        .icon-preview-box img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #eee; border: 1px solid #ccc; }
+        .icon-preview-box img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #eee; }
         .status-badge { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
         .status-ok { background: #e6f4ea; color: #1e8e3e; }
         .status-err { background: #fce8e6; color: #d93025; }
-
         .recs-visual-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 10px; max-height: 180px; overflow-y: auto; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
         .rec-item { cursor: pointer; border: 2px solid transparent; border-radius: 10px; position: relative; }
         .rec-item.selected { border-color: var(--p-green); background: #e6f4ea; }
         .rec-item img { width: 100%; aspect-ratio: 1/1; border-radius: 8px; object-fit: cover; }
         .rec-item .check { position: absolute; top: -5px; right: -5px; background: var(--p-green); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; display: none; text-align: center; line-height: 18px; }
         .rec-item.selected .check { display: block; }
-
-        .btn-plus { background: var(--p-green); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-plus:active { transform: scale(0.95); }
+        .btn-plus { background: var(--p-green); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
         .btn-red { background: #d93025; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 10px; }
         .item-row { background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 8px; }
-        
         #save-status-msg { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; display: none; z-index: 6000; }
     </style>
 </head>
 <body>
 
     <header>
-        <input type="text" id="search" placeholder="Search to edit/manage..." style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;" oninput="renderAdminGrid()">
+        <input type="text" id="search" placeholder="Search apps..." style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;" oninput="renderAdminGrid()">
         <button onclick="openEditor()" class="btn-plus" style="width:45px; height:45px; border-radius:50%; font-size:24px;">+</button>
     </header>
 
     <div id="save-status-msg"></div>
-
     <div class="container"><div id="admin-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:15px;"></div></div>
 
     <div id="editor-modal">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 id="m-title" style="color:var(--p-green);">Database Editor</h2>
+            <h2 style="color:var(--p-green);">Admin Editor</h2>
             <button onclick="closeEditor()" style="font-size:35px; border:none; background:none; cursor:pointer;">&times;</button>
         </div>
 
@@ -65,37 +55,32 @@
 
         <div class="trending-row">
             <input type="checkbox" id="f-trending" style="width:20px; height:20px;">
-            <label for="f-trending" style="font-weight:bold; cursor:pointer;">Set as Trending (Feature in Hero Banner)</label>
+            <label for="f-trending" style="font-weight:bold; cursor:pointer;">🔥 Set as Trending (Hero Banner)</label>
         </div>
 
         <div class="section">
-            <span class="section-h">1. Identity & Keywords</span>
-            <div class="field"><label>Unique ID (Manual)</label><input type="text" id="f-id" placeholder="game-id-here" oninput="validateID()"></div>
-            <div id="id-error" style="color:red; font-size:10px; display:none; margin-bottom:10px; font-weight:bold;">⚠️ Error: ID already exists!</div>
-            <div class="field">
-                <label>Content Type</label>
-                <select id="f-type">
-                    <option value="game">Game</option>
-                    <option value="app">App</option>
-                </select>
-            </div>
-            <div class="field"><label>App Name</label><input type="text" id="f-name"></div>
-            <div class="field"><label>Category</label><input type="text" id="f-cat" placeholder="Action, Adventure, Tools"></div>
-            <div class="field"><label>Keywords (comma separated for search feature)</label><input type="text" id="f-keys" placeholder="ninja, mod, battle, racing"></div>
+            <span class="section-h">1. Identity & Info</span>
+            <div class="field"><label>Unique ID (Used for linking)</label><input type="text" id="f-id" oninput="validateID()"></div>
+            <div id="id-error" style="color:red; font-size:10px; display:none; margin-bottom:10px;">ID already exists!</div>
+            <div class="field"><label>Type</label><select id="f-type"><option value="game">Game</option><option value="app">App</option></select></div>
+            <div class="field"><label>Name</label><input type="text" id="f-name"></div>
+            <div class="field"><label>Category</label><input type="text" id="f-cat"></div>
+            <div class="field"><label>Keywords (comma separated)</label><input type="text" id="f-keys"></div>
+            <div class="field"><label>Description</label><textarea id="f-desc" rows="3"></textarea></div>
         </div>
 
         <div class="section">
-            <span class="section-h">2. Timeline (Dates)</span>
+            <span class="section-h">2. Dates & Timeline</span>
             <div class="date-grid">
-                <div class="field"><label>Release Date</label><input type="date" id="f-release"></div>
-                <div class="field"><label>Uploaded Date</label><input type="date" id="f-upload"></div>
+                <div class="field"><label>Release</label><input type="date" id="f-release"></div>
+                <div class="field"><label>Uploaded</label><input type="date" id="f-upload"></div>
                 <div class="field"><label>Last Update</label><input type="date" id="f-last"></div>
             </div>
         </div>
 
         <div class="section">
-            <span class="section-h">3. Visual Recommendations (Tick to select)</span>
-            <div class="field"><label>Selected IDs (Manual/Auto)</label><input type="text" id="f-recs" oninput="syncVisualRecs()"></div>
+            <span class="section-h">3. Visual Recommendations</span>
+            <div class="field"><label>Selected IDs</label><input type="text" id="f-recs" oninput="syncVisualRecs()"></div>
             <div class="recs-visual-box" id="visual-recs-grid"></div>
         </div>
 
@@ -103,27 +88,24 @@
             <span class="section-h">4. Assets & Icons</span>
             <div class="field">
                 <label>Icon Path</label>
-                <input type="text" id="f-icon" oninput="checkIconPath(this.value)" placeholder="icons/myicon.png">
+                <input type="text" id="f-icon" oninput="checkIconPath(this.value)">
                 <div class="icon-preview-box">
                     <img id="icon-preview" src="" onerror="this.src='https://via.placeholder.com/50?text=ERR'">
-                    <div>
-                        <div id="icon-status-text" style="font-size:11px; font-weight:bold;">No Icon Detected</div>
-                        <span id="icon-status-badge" class="status-badge status-err">UNVERIFIED</span>
-                    </div>
+                    <div><span id="icon-status-badge" class="status-badge status-err">UNVERIFIED</span></div>
                 </div>
             </div>
-            <div class="field"><label>Total App Size</label><input type="text" id="f-size" placeholder="100 MB"></div>
+            <div class="field"><label>Total Size</label><input type="text" id="f-size"></div>
             <div id="media-container"></div>
-            <button class="btn-plus" style="font-size:10px; padding:6px 12px; margin-top:5px;" onclick="addMediaRow()">+ Add Screen/Video Path</button>
+            <button class="btn-plus" style="font-size:10px; padding:6px;" onclick="addMediaRow()">+ Add Media</button>
         </div>
 
         <div class="section">
-            <span class="section-h">5. Download Version Control</span>
+            <span class="section-h">5. Versions</span>
             <div id="v-container"></div>
-            <button class="btn-plus" style="font-size:10px; padding:6px 12px;" onclick="addVersionRow()">+ Add New Version Group</button>
+            <button class="btn-plus" style="font-size:10px; padding:6px;" onclick="addVersionRow()">+ Add Version</button>
         </div>
 
-        <button id="main-save-btn" class="btn-plus" style="width:100%; padding:20px; font-size:16px; margin-top:10px;" onclick="preSaveCheck()">SAVE TO DATABASE</button>
+        <button id="main-save-btn" class="btn-plus" style="width:100%; padding:18px;" onclick="preSaveCheck()">SAVE TO DATABASE</button>
     </div>
 
     <div style="position:fixed; bottom:0; width:100%; background:#f1f3f4; padding:15px; display:flex; gap:10px; border-top:1px solid #ddd; z-index:4000;">
@@ -137,47 +119,27 @@
         let isIconValid = false;
 
         async function init() {
-            try { 
-                const res = await fetch('info.json'); 
-                const d = await res.json(); 
-                db = d.apps; 
-                renderAdminGrid(); 
-            } catch(e) { console.warn("New Database Mode"); }
+            try { const res = await fetch('info.json'); const d = await res.json(); db = d.apps; renderAdminGrid(); } catch(e) {}
         }
 
         function checkIconPath(path) {
             const img = document.getElementById('icon-preview');
             const badge = document.getElementById('icon-status-badge');
-            const text = document.getElementById('icon-status-text');
-            
-            if(!path) {
-                img.src = ""; text.innerText = "No Path Entered";
-                badge.className = "status-badge status-err"; badge.innerText = "EMPTY";
-                isIconValid = false; return;
-            }
-
-            img.onload = () => {
-                badge.className = "status-badge status-ok"; badge.innerText = "PATH VALID";
-                text.innerText = "Icon Loaded Successfully";
-                isIconValid = true;
-            };
-            img.onerror = () => {
-                badge.className = "status-badge status-err"; badge.innerText = "FILE NOT FOUND";
-                text.innerText = "Path seems broken!";
-                isIconValid = false;
-            };
+            if(!path) { isIconValid = false; badge.className="status-badge status-err"; badge.innerText="EMPTY"; return; }
+            img.onload = () => { isIconValid = true; badge.className="status-badge status-ok"; badge.innerText="VALID"; };
+            img.onerror = () => { isIconValid = false; badge.className="status-badge status-err"; badge.innerText="BROKEN"; };
             img.src = path;
         }
 
         function renderAdminGrid() {
             const q = document.getElementById('search').value.toLowerCase();
             document.getElementById('admin-grid').innerHTML = db.filter(a => a.name.toLowerCase().includes(q)).map((a, i) => `
-                <div style="background:var(--p-surface); border-radius:15px; padding:10px; text-align:center; border:1px solid var(--p-border);">
-                    <img src="${a.icon}" style="width:100%; aspect-ratio:1/1; border-radius:12px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/150?text=Error'">
-                    <div style="font-size:12px; margin:8px 0; font-weight:bold; height:32px; overflow:hidden;">${a.name}</div>
-                    <div style="display:flex; gap:5px;">
-                        <button onclick="openEditor(${i})" style="flex:1; background:#1a73e8; color:white; border:none; padding:6px; border-radius:6px; font-size:10px; cursor:pointer;">Edit</button>
-                        <button onclick="deleteApp(${i})" style="flex:1; background:#d93025; color:white; border:none; padding:6px; border-radius:6px; font-size:10px; cursor:pointer;">Del</button>
+                <div style="background:var(--p-surface); border-radius:12px; padding:10px; text-align:center; border:1px solid var(--p-border);">
+                    <img src="${a.icon}" style="width:100%; aspect-ratio:1/1; border-radius:10px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/100'">
+                    <div style="font-size:11px; margin:8px 0; font-weight:bold; height:30px; overflow:hidden;">${a.name}</div>
+                    <div style="display:flex; gap:4px;">
+                        <button onclick="openEditor(${i})" style="flex:1; background:#1a73e8; color:white; border:none; padding:5px; border-radius:4px; font-size:9px;">Edit</button>
+                        <button onclick="deleteApp(${i})" style="flex:1; background:#d93025; color:white; border:none; padding:5px; border-radius:4px; font-size:9px;">Del</button>
                     </div>
                 </div>
             `).join('');
@@ -192,7 +154,7 @@
             const currentID = idx > -1 ? db[idx].id : "";
             document.getElementById('visual-recs-grid').innerHTML = db.filter(a => a.id !== currentID).map(a => `
                 <div class="rec-item" id="vis-${a.id}" onclick="toggleRec('${a.id}')">
-                    <img src="${a.icon}" onerror="this.src='https://via.placeholder.com/80'"><div class="check">✓</div>
+                    <img src="${a.icon}"><div class="check">✓</div>
                 </div>
             `).join('');
 
@@ -200,15 +162,16 @@
                 const a = db[idx];
                 document.getElementById('f-id').value = a.id;
                 document.getElementById('f-trending').checked = a.isTrending || false;
-                document.getElementById('f-type').value = a.type || "game";
+                document.getElementById('f-type').value = a.type;
                 document.getElementById('f-name').value = a.name;
-                document.getElementById('f-cat').value = a.category || "";
-                document.getElementById('f-keys').value = a.keywords || "";
-                document.getElementById('f-release').value = a.releaseDate || "";
-                document.getElementById('f-upload').value = a.uploadedDate || "";
-                document.getElementById('f-last').value = a.lastUpdate || "";
+                document.getElementById('f-cat').value = a.category;
+                document.getElementById('f-keys').value = a.keywords;
+                document.getElementById('f-desc').value = a.description || "";
+                document.getElementById('f-release').value = a.releaseDate;
+                document.getElementById('f-upload').value = a.uploadedDate;
+                document.getElementById('f-last').value = a.lastUpdate;
                 document.getElementById('f-icon').value = a.icon;
-                document.getElementById('f-size').value = a.size || "";
+                document.getElementById('f-size').value = a.size;
                 checkIconPath(a.icon);
                 selectedRecs = a.manualRecs || [];
                 document.getElementById('f-recs').value = selectedRecs.join(', ');
@@ -218,10 +181,8 @@
             } else {
                 document.getElementById('f-id').value = "id-" + Date.now();
                 document.getElementById('f-upload').value = new Date().toISOString().split('T')[0];
-                checkIconPath("");
                 addVersionRow();
             }
-            validateID();
         }
 
         function toggleRec(id) {
@@ -232,49 +193,34 @@
         }
 
         function syncVisualRecs() {
-            const manual = document.getElementById('f-recs').value;
-            selectedRecs = manual.split(',').map(s => s.trim()).filter(s => s);
+            selectedRecs = document.getElementById('f-recs').value.split(',').map(s => s.trim()).filter(s => s);
             document.querySelectorAll('.rec-item').forEach(el => el.classList.remove('selected'));
-            selectedRecs.forEach(id => {
-                const el = document.getElementById('vis-' + id);
-                if(el) el.classList.add('selected');
-            });
+            selectedRecs.forEach(id => { const el = document.getElementById('vis-' + id); if(el) el.classList.add('selected'); });
         }
 
         function addMediaRow(val = "") {
             const div = document.createElement('div');
-            div.className = "item-row";
-            div.style.display = "flex"; div.style.gap = "5px";
-            div.innerHTML = `<input type="text" class="m-path" value="${val}" style="flex:1" placeholder="assets/screen.jpg"> <button class="btn-red" onclick="this.parentElement.remove()">X</button>`;
+            div.style = "display:flex; gap:5px; margin-bottom:5px;";
+            div.innerHTML = `<input type="text" class="m-path" value="${val}" placeholder="Path"> <button class="btn-red" onclick="this.parentElement.remove()">X</button>`;
             document.getElementById('media-container').appendChild(div);
         }
 
         function addVersionRow(v="", s="", u="") {
             const div = document.createElement('div');
             div.className = "item-row";
-            div.innerHTML = `
-                <div style="display:flex; gap:5px; margin-bottom:5px;">
-                    <input type="text" class="v-ver" placeholder="Version (1.0)" value="${v}" style="width:30%">
-                    <input type="text" class="v-size" placeholder="Size (50MB)" value="${s}" style="width:30%">
-                    <button class="btn-red" onclick="this.parentElement.parentElement.remove()">Remove</button>
-                </div>
-                <input type="text" class="v-url" placeholder="Direct Download Link" value="${u}">
-            `;
+            div.innerHTML = `<input type="text" class="v-ver" placeholder="Ver" value="${v}" style="width:30%"> <input type="text" class="v-size" placeholder="Size" value="${s}" style="width:30%"> <input type="text" class="v-url" placeholder="URL" value="${u}" style="width:100%; margin-top:5px;"> <button class="btn-red" onclick="this.parentElement.remove()">Del</button>`;
             document.getElementById('v-container').appendChild(div);
         }
 
         function validateID() {
-            const input = document.getElementById('f-id');
-            const exists = db.some((app, i) => app.id === input.value && i != document.getElementById('edit-index').value);
+            const val = document.getElementById('f-id').value;
+            const exists = db.some((a, i) => a.id === val && i != document.getElementById('edit-index').value);
             document.getElementById('id-error').style.display = exists ? 'block' : 'none';
             document.getElementById('main-save-btn').disabled = exists;
-            document.getElementById('main-save-btn').style.opacity = exists ? "0.5" : "1";
         }
 
         function preSaveCheck() {
-            if(!isIconValid) {
-                if(!confirm("⚠️ ICON ERROR: System couldn't find the icon image. Save anyway?")) return;
-            }
+            if(!isIconValid && !confirm("Icon path is broken. Save anyway?")) return;
             saveAll();
         }
 
@@ -287,6 +233,7 @@
                 name: document.getElementById('f-name').value,
                 category: document.getElementById('f-cat').value,
                 keywords: document.getElementById('f-keys').value,
+                description: document.getElementById('f-desc').value,
                 releaseDate: document.getElementById('f-release').value,
                 uploadedDate: document.getElementById('f-upload').value,
                 lastUpdate: document.getElementById('f-last').value,
@@ -294,28 +241,19 @@
                 size: document.getElementById('f-size').value,
                 manualRecs: selectedRecs,
                 media: Array.from(document.querySelectorAll('.m-path')).map(i => i.value).filter(v => v),
-                versions: Array.from(document.querySelectorAll('#v-container .v-ver')).map((el, i) => ({
-                    ver: el.value,
+                versions: Array.from(document.querySelectorAll('#v-container')).map((el, i) => ({
+                    ver: document.querySelectorAll('.v-ver')[i].value,
                     size: document.querySelectorAll('.v-size')[i].value,
                     url: document.querySelectorAll('.v-url')[i].value
                 })).filter(v => v.ver)
             };
-            
             if(idx > -1) db[idx] = obj; else db.push(obj);
-            
-            showToast("Saved Successfully!");
             closeEditor(); renderAdminGrid();
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('save-status-msg');
-            t.innerText = msg; t.style.display = "block";
-            setTimeout(() => t.style.display = "none", 3000);
-        }
-
-        function deleteApp(i) { if(confirm("Are you sure you want to delete this content?")) { db.splice(i, 1); renderAdminGrid(); } }
+        function deleteApp(i) { if(confirm("Delete?")) { db.splice(i, 1); renderAdminGrid(); } }
         function closeEditor() { document.getElementById('editor-modal').style.display = 'none'; }
-        function copyJSON() { navigator.clipboard.writeText(JSON.stringify({apps:db}, null, 2)); alert("JSON Copied to Clipboard!"); }
+        function copyJSON() { navigator.clipboard.writeText(JSON.stringify({apps:db}, null, 2)); alert("Copied!"); }
         function downloadJSON() {
             const blob = new Blob([JSON.stringify({apps:db}, null, 2)], {type: "application/json"});
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "info.json"; a.click();
@@ -323,4 +261,5 @@
         init();
     </script>
 </body>
-</html>
+    </html>
+    
