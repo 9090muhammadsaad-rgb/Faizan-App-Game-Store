@@ -12,56 +12,45 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Google Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--p-bg); color: var(--p-txt); transition: 0.3s; overflow-x: hidden; }
 
-        header { position: fixed; top: 0; width: 100%; background: var(--p-bg); z-index: 1000; padding: 12px 16px; border-bottom: 1px solid var(--p-border); display: flex; align-items: center; gap: 10px; transition: 0.3s; }
-        header.hide { transform: translateY(-100%); }
+        header { position: fixed; top: 0; width: 100%; background: var(--p-bg); z-index: 1000; padding: 12px 16px; border-bottom: 1px solid var(--p-border); display: flex; align-items: center; gap: 10px; }
         .search-pill { flex: 1; display: flex; align-items: center; background: var(--p-surface); border-radius: 8px; padding: 0 12px; }
         .search-input { width: 100%; border: none; background: transparent; padding: 12px; font-size: 15px; outline: none; color: var(--p-txt); }
 
-        #hero-trending { padding: 80px 16px 0; display: none; }
-        .hero-banner { width: 100%; height: 200px; border-radius: 15px; background: #000; overflow: hidden; position: relative; cursor: pointer; border: 1px solid var(--p-border); }
-        .hero-banner video, .hero-banner img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
-        .hero-info { position: absolute; bottom: 0; left: 0; padding: 15px; color: white; background: linear-gradient(transparent, rgba(0,0,0,0.8)); width: 100%; }
-        .hero-tag { background: var(--p-green); color: white; font-size: 10px; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-weight: bold; }
+        /* SECTIONS STYLING */
+        .section-title { padding: 15px 16px 5px; font-size: 18px; font-weight: 700; color: var(--p-txt); display: flex; justify-content: space-between; align-items: center; }
+        .section-title span { font-size: 12px; color: var(--p-green); }
 
-        #drawer { position: fixed; top: 0; right: -100%; width: 300px; height: 100%; background: var(--p-drawer); z-index: 6000; padding: 25px; transition: 0.4s; box-shadow: -10px 0 30px rgba(0,0,0,0.2); overflow-y: auto; }
+        /* OFFER SLIDER */
+        .offer-row { display: flex; overflow-x: auto; gap: 15px; padding: 10px 16px; scrollbar-width: none; }
+        .offer-row::-webkit-scrollbar { display: none; }
+        .offer-card { min-width: 280px; height: 160px; border-radius: 15px; position: relative; overflow: hidden; background: #000; flex-shrink: 0; border: 1px solid var(--p-border); }
+        .offer-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        .offer-info { position: absolute; bottom: 0; left: 0; padding: 12px; color: white; background: linear-gradient(transparent, rgba(0,0,0,0.8)); width: 100%; }
+
+        /* DRAWER & OVERLAY */
+        #drawer { position: fixed; top: 0; right: -100%; width: 300px; height: 100%; background: var(--p-drawer); z-index: 6000; padding: 25px; transition: 0.4s; box-shadow: -10px 0 30px rgba(0,0,0,0.2); }
         #drawer.open { right: 0; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 5500; display: none; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
-        .drawer-btn { width: 100%; padding: 14px 10px; text-align: left; border: none; background: transparent; border-bottom: 1px solid var(--p-border); color: var(--p-txt); font-size: 15px; cursor: pointer; }
+        .drawer-btn { width: 100%; padding: 14px 10px; text-align: left; border: none; background: transparent; border-bottom: 1px solid var(--p-border); color: var(--p-txt); font-size: 15px; }
 
-        .container { padding: 20px 16px 120px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 18px; }
-        .app-card { cursor: pointer; text-align: left; animation: fadeIn 0.4s ease; position: relative; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* GRID */
+        .container { padding: 65px 0 120px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 15px; padding: 10px 16px; }
+        .app-card { cursor: pointer; position: relative; }
         .app-card img { width: 100%; aspect-ratio: 1/1; border-radius: 22%; object-fit: cover; border: 1px solid var(--p-border); }
-        .app-name { font-size: 12px; font-weight: 500; margin-top: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        
-        /* New Badge Style */
-        .new-badge { position: absolute; top: 5px; left: 5px; background: #d93025; color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; z-index: 5; }
+        .app-name { font-size: 11px; font-weight: 500; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .new-badge { position: absolute; top: 5px; left: 5px; background: #d93025; color: white; font-size: 8px; padding: 2px 5px; border-radius: 4px; font-weight: bold; z-index: 5; }
 
+        /* DETAILS */
         #details { position: fixed; inset: 0; background: var(--p-bg); z-index: 5000; display: none; overflow-y: auto; }
         .d-header { position: sticky; top: 0; background: var(--p-bg); padding: 15px; border-bottom: 1px solid var(--p-border); z-index: 10; display: flex; align-items: center; }
-        .hero-section { padding: 20px; display: flex; align-items: center; gap: 20px; }
-        .hero-section img { width: 90px; height: 90px; border-radius: 22%; border: 1px solid var(--p-border); }
-        .hero-section h2 { font-size: 24px; font-weight: 700; }
-
-        .specs-box { margin: 0 20px 20px; padding: 15px; background: var(--p-surface); border-radius: 12px; font-size: 13px; }
-        .mod-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 11px; margin-bottom: 8px; }
-        .badge-mod { background: #fce4ec; color: #d81b60; }
-        .badge-orig { background: #e8f5e9; color: #2e7d32; }
-
-        .gallery { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
-        .gallery::-webkit-scrollbar { display: none; }
-        .gallery img, .gallery video { height: 180px; width: auto; min-width: 100px; border-radius: 12px; border: 1px solid var(--p-border); background: #eee; }
-
-        .dl-section { padding: 0 20px 30px; }
-        .dl-card { background: var(--p-surface); padding: 20px; border-radius: 16px; margin-bottom: 15px; }
-        .dl-btn { display: block; width: 100%; background: var(--p-green); color: white; padding: 18px; border-radius: 12px; font-weight: 700; font-size: 18px; text-decoration: none; text-align: center; border: none; cursor: pointer; }
-        
-        .rec-section { padding: 20px; background: var(--p-surface); border-top: 1px solid var(--p-border); }
+        .hero-section { padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .hero-section img { width: 85px; height: 85px; border-radius: 22%; border: 1px solid var(--p-border); }
+        .dl-btn { display: block; width: 100%; background: var(--p-green); color: white; padding: 16px; border-radius: 12px; font-weight: 700; text-decoration: none; text-align: center; }
 
         nav { position: fixed; bottom: 0; width: 100%; background: var(--p-bg); border-top: 1px solid var(--p-border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 4000; }
-        .nav-link { border: none; background: none; color: gray; font-size: 12px; font-weight: 500; flex: 1; cursor: pointer; }
+        .nav-link { border: none; background: none; color: gray; font-size: 12px; flex: 1; cursor: pointer; }
         .nav-link.active { color: var(--p-green); font-weight: 700; }
     </style>
 </head>
@@ -69,45 +58,30 @@
 
     <header id="main-header">
         <div class="search-pill">
-            <input type="text" id="search" class="search-input" placeholder="Search by name or keywords...">
+            <input type="text" id="search" class="search-input" placeholder="Search (all, allgame, allapp)...">
         </div>
-        <div onclick="toggleDrawer(true)" style="cursor:pointer; font-size: 24px;">🔘</div>
+        <div onclick="toggleDrawer(true)" style="cursor:pointer; font-size: 20px;">🔘</div>
     </header>
 
-    <div id="hero-trending"></div>
-
     <div class="overlay" id="overlay" onclick="toggleDrawer(false)"></div>
-
     <div id="drawer">
         <div style="font-size: 20px; font-weight: 700; color: var(--p-green); margin-bottom: 20px;">Settings</div>
-        <button class="drawer-btn" onclick="window.location.href='#'">❓ Help & Support</button>
-        <button class="drawer-btn" onclick="sortData('size-h')">📈 Highest To Lowest Size</button>
-        <button class="drawer-btn" onclick="sortData('size-l')">📉 Lowest To Highest Size</button>
-        <button class="drawer-btn" onclick="sortData('date-n')">🆕 Newest To Oldest</button>
-        <button class="drawer-btn" onclick="sortData('date-o')">📅 Oldest To Newest</button>
+        <button class="drawer-btn" onclick="sortData('size-h')">📈 High to Low Size</button>
+        <button class="drawer-btn" onclick="sortData('size-l')">📉 Low to High Size</button>
         <button class="drawer-btn" onclick="setTheme('dark')">🌙 Dark Mode</button>
-        <button class="drawer-btn" onclick="setTheme('light')">☀️ White Mode</button>
-        <button class="drawer-btn" onclick="sortData('default')" style="color:var(--p-green); font-weight:bold;">🔄 Default All</button>
+        <button class="drawer-btn" onclick="setTheme('light')">☀️ Light Mode</button>
         <button onclick="toggleDrawer(false)" style="width:100%; padding:15px; background:var(--p-active); color:var(--p-green); border:none; border-radius:10px; margin-top:20px; font-weight:bold;">CLOSE</button>
     </div>
 
-    <div class="container">
-        <div class="grid" id="main-grid"></div>
-    </div>
+    <div class="container" id="page-content">
+        </div>
 
     <div id="details">
-        <div class="d-header">
-            <button onclick="closeDetails()" style="background:none; border:none; font-size:24px; color:var(--p-txt);">←</button>
-            <span id="d-nav-title" style="margin-left:20px; font-weight:700"></span>
-        </div>
+        <div class="d-header"><button onclick="closeDetails()" style="background:none; border:none; font-size:24px;">←</button><span id="d-nav-title" style="margin-left:15px; font-weight:700;"></span></div>
         <div id="d-hero"></div>
-        <div id="d-specs"></div>
-        <div class="gallery" id="d-gallery"></div>
-        <div class="dl-section" id="d-versions"></div>
-        <div class="rec-section">
-            <h4 style="margin-bottom:15px;">RECOMMENDED</h4>
-            <div class="grid" id="d-recs" style="grid-template-columns: repeat(3, 1fr);"></div>
-        </div>
+        <div id="d-specs" style="padding: 0 20px;"></div>
+        <div class="gallery" id="d-gallery" style="display:flex; gap:10px; overflow-x:auto; padding:20px;"></div>
+        <div class="dl-section" id="d-versions" style="padding:20px;"></div>
     </div>
 
     <nav>
@@ -118,145 +92,135 @@
 
     <script>
         let db = [];
-        let currentList = [];
-        let lastScroll = 0;
+        let currentTab = 'all';
 
         async function init() {
             try {
                 const res = await fetch('info.json');
                 const data = await res.json();
                 db = data.apps;
-                currentList = [...db];
-                renderHero();
-                renderGrid(currentList);
-            } catch (e) { console.error(e); }
+                renderPage('all');
+            } catch (e) { console.error("JSON Load Error"); }
         }
 
-        function renderHero() {
-            const trending = db.filter(a => a.isTrending);
-            if (trending.length > 0) {
-                const randomApp = trending[Math.floor(Math.random() * trending.length)];
-                const heroBox = document.getElementById('hero-trending');
-                const cover = (randomApp.media && randomApp.media[0]) ? randomApp.media[0] : randomApp.icon;
-                const isVideo = cover.endsWith('.mp4');
+        function renderPage(type) {
+            const container = document.getElementById('page-content');
+            container.innerHTML = "";
+            let filtered = type === 'all' ? db : db.filter(a => a.type === type);
 
-                heroBox.innerHTML = `
-                    <div class="hero-banner" onclick="openDetails('${randomApp.id}')">
-                        ${isVideo ? `<video src="${cover}" autoplay muted loop></video>` : `<img src="${cover}">`}
-                        <div class="hero-info">
-                            <span class="hero-tag">Trending Now</span>
-                            <h3 style="margin-top:5px;">${randomApp.name}</h3>
-                            <p style="font-size:11px; opacity:0.8;">Explore and Download now</p>
-                        </div>
-                    </div>
-                `;
-                heroBox.style.display = 'block';
+            // 1. OFFER SECTION
+            const offers = filtered.slice().sort(() => 0.5 - Math.random()).slice(0, 5);
+            if(offers.length > 0) {
+                container.innerHTML += `<div class="section-title">Special Offers <span>See all</span></div>`;
+                let offerHtml = `<div class="offer-row">`;
+                offers.forEach(a => {
+                    offerHtml += `
+                        <div class="offer-card" onclick="openDetails('${a.id}')">
+                            <img src="${a.media[0] || a.icon}">
+                            <div class="offer-info"><b>${a.name}</b><br><small>Exclusive MOD</small></div>
+                        </div>`;
+                });
+                container.innerHTML += offerHtml + `</div>`;
             }
+
+            // 2. TRENDING SECTION (Random Mix)
+            const trending = filtered.filter(a => a.isTrending);
+            if(trending.length > 0) {
+                container.innerHTML += `<div class="section-title">Trending Now <span>🔥</span></div>`;
+                let gridHtml = `<div class="grid">`;
+                trending.forEach(a => gridHtml += appCard(a));
+                container.innerHTML += gridHtml + `</div>`;
+            }
+
+            // 3. RANDOM CATEGORY SECTION (Only for Home/All)
+            if(type === 'all') {
+                const cats = [...new Set(db.map(a => a.category))].sort(() => 0.5 - Math.random()).slice(0, 2);
+                cats.forEach(c => {
+                    if(!c) return;
+                    const catApps = db.filter(a => a.category === c).slice(0, 4);
+                    container.innerHTML += `<div class="section-title">Based on ${c} <span>Explore</span></div>`;
+                    let gridHtml = `<div class="grid">`;
+                    catApps.forEach(a => gridHtml += appCard(a));
+                    container.innerHTML += gridHtml + `</div>`;
+                });
+            }
+
+            // 4. GENERAL GRID (Rest of items)
+            container.innerHTML += `<div class="section-title">Recommended for You</div>`;
+            let restHtml = `<div class="grid">`;
+            filtered.forEach(a => restHtml += appCard(a));
+            container.innerHTML += restHtml + `</div>`;
         }
 
-        function renderGrid(list) {
-            document.getElementById('main-grid').innerHTML = list.map(a => `
+        function appCard(a) {
+            return `
                 <div class="app-card" onclick="openDetails('${a.id}')">
-                    ${a.isNew ? `<div class="new-badge">New</div>` : ''}
+                    ${a.isNew ? `<div class="new-badge">NEW</div>` : ''}
                     <img src="${a.icon}" onerror="this.src='https://via.placeholder.com/150'">
                     <div class="app-name">${a.name}</div>
-                    <div style="font-size:10px; color:gray;">${a.size} • ${a.releaseDate || a.uploadedDate}</div>
-                </div>
-            `).join('');
+                    <div style="font-size:9px; color:gray;">${a.size} • ${a.type.toUpperCase()}</div>
+                </div>`;
         }
+
+        // SEARCH LOGIC (All, Allgame, Allapp)
+        document.getElementById('search').addEventListener('input', e => {
+            const val = e.target.value.toLowerCase().trim();
+            const container = document.getElementById('page-content');
+            
+            if(val === 'all') { renderPage('all'); return; }
+            if(val === 'allgame') { renderPage('game'); return; }
+            if(val === 'allapp') { renderPage('app'); return; }
+            
+            if(val.length < 2) { renderPage(currentTab); return; }
+
+            // Keyword Search
+            const filtered = db.filter(x => x.name.toLowerCase().includes(val) || (x.keywords && x.keywords.toLowerCase().includes(val)));
+            container.innerHTML = `<div class="section-title">Search Results for "${val}"</div><div class="grid">` + filtered.map(a => appCard(a)).join('') + `</div>`;
+        });
 
         function openDetails(id) {
             const a = db.find(x => x.id === id);
             document.getElementById('d-nav-title').innerText = a.name;
-            document.getElementById('d-hero').innerHTML = `<div class="hero-section"><img src="${a.icon}"><h2>${a.name}</h2></div>`;
+            document.getElementById('d-hero').innerHTML = `<div class="hero-section"><img src="${a.icon}"><div><h2>${a.name}</h2><p style="color:var(--p-green); font-size:13px;">Verified Content</p></div></div>`;
             
             const isMod = a.name.toLowerCase().includes('mod');
-            const badgeClass = isMod ? 'badge-mod' : 'badge-orig';
-            const badgeText = isMod ? 'MOD UNLOCKED' : 'OFFICIAL';
-            
             document.getElementById('d-specs').innerHTML = `
-                <div class="specs-box">
-                    <div class="mod-badge ${badgeClass}">${badgeText}</div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span><b>Type:</b> ${a.type.toUpperCase()}</span>
-                        <span><b>Category:</b> ${a.category || 'N/A'}</span>
-                    </div>
-                    <div style="font-size:11px; color:gray;">
-                        Release: ${a.releaseDate || 'N/A'} | Updated: ${a.lastUpdate || a.uploadedDate}
-                    </div>
-                </div>
-            `;
+                <div style="background:var(--p-surface); padding:15px; border-radius:12px; font-size:13px;">
+                    <b>Category:</b> ${a.category} | <b>Size:</b> ${a.size}<br>
+                    <b>Status:</b> ${isMod ? 'MOD Version' : 'Original Version'}
+                </div>`;
 
             const gal = document.getElementById('d-gallery');
-            if (a.media && a.media.length > 0) {
-                gal.innerHTML = a.media.map(m => {
-                    const ext = m.split('.').pop().toLowerCase();
-                    if (['mp4', 'webm'].includes(ext)) return `<video src="${m}" controls preload="metadata"></video>`;
-                    return `<img src="${m}" onerror="this.style.display='none'">`;
-                }).join('');
-                gal.style.display = 'flex';
-            } else { gal.style.display = 'none'; }
+            gal.innerHTML = (a.media || []).map(m => `<img src="${m}" style="height:160px; border-radius:10px;">`).join('');
 
             document.getElementById('d-versions').innerHTML = (a.versions || []).map(v => `
-                <div class="dl-card">
-                    <div style="margin-bottom:10px;"><b>Version: ${v.ver}</b> | Size: ${v.size}</div>
+                <div style="background:var(--p-surface); padding:15px; border-radius:12px; margin-bottom:10px;">
+                    <div style="margin-bottom:10px;"><b>Version: ${v.ver}</b> (${v.size})</div>
                     <a href="${v.url}" class="dl-btn">Download Apk</a>
                 </div>`).join('');
 
-            const recs = db.filter(x => x.category === a.category && x.id !== a.id).slice(0, 3);
-            document.getElementById('d-recs').innerHTML = recs.map(r => `
-                <div class="app-card" onclick="openDetails('${r.id}')">
-                    <img src="${r.icon}">
-                    <div class="app-name" style="font-size:10px;">${r.name}</div>
-                </div>`).join('');
-
             document.getElementById('details').style.display = 'block';
-            document.body.style.overflow = 'hidden';
         }
 
-        document.getElementById('search').addEventListener('input', e => {
-            const val = e.target.value.toLowerCase().trim();
-            if(!val) { renderGrid(currentList); return; }
-            const filtered = db.filter(x => {
-                const name = x.name.toLowerCase();
-                const keys = (x.keywords || "").toLowerCase();
-                return name.includes(val) || keys.includes(val);
-            });
-            renderGrid(filtered);
-        });
-
-        function sortData(type) {
-            let sorted = [...currentList];
-            if (type === 'size-h') sorted.sort((a,b) => parseSize(b.size) - parseSize(a.size));
-            if (type === 'size-l') sorted.sort((a,b) => parseSize(a.size) - parseSize(b.size));
-            if (type === 'date-n') sorted.sort((a,b) => new Date(b.uploadedDate || b.releaseDate) - new Date(a.uploadedDate || a.releaseDate));
-            if (type === 'date-o') sorted.sort((a,b) => new Date(a.uploadedDate || a.releaseDate) - new Date(b.uploadedDate || b.releaseDate));
-            if (type === 'default') sorted = [...db];
-            renderGrid(sorted); toggleDrawer(false);
-        }
-
-        function parseSize(s) { let n = parseFloat(s); if(s.toUpperCase().includes('GB')) n *= 1024; return n || 0; }
-        function toggleDrawer(s) { document.getElementById('drawer').classList.toggle('open', s); document.getElementById('overlay').classList.toggle('active', s); }
-        function setTheme(t) { document.body.setAttribute('data-theme', t); toggleDrawer(false); }
-        function closeDetails() { document.getElementById('details').style.display = 'none'; document.body.style.overflow = 'auto'; }
-        
         function tab(t, el) {
             document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
-            currentList = (t === 'all') ? db : db.filter(x => x.type === t);
-            renderGrid(currentList);
+            currentTab = t;
+            renderPage(t);
         }
 
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            const header = document.getElementById('main-header');
-            if (currentScroll > lastScroll && currentScroll > 80) header.classList.add('hide');
-            else header.classList.remove('hide');
-            lastScroll = currentScroll;
-        });
+        function sortData(type) {
+            if(type === 'size-h') db.sort((a,b) => parseFloat(b.size) - parseFloat(a.size));
+            if(type === 'size-l') db.sort((a,b) => parseFloat(a.size) - parseFloat(b.size));
+            renderPage(currentTab);
+            toggleDrawer(false);
+        }
 
+        function toggleDrawer(s) { document.getElementById('drawer').classList.toggle('open', s); document.getElementById('overlay').classList.toggle('active', s); }
+        function setTheme(t) { document.body.setAttribute('data-theme', t); toggleDrawer(false); }
+        function closeDetails() { document.getElementById('details').style.display = 'none'; }
+        
         init();
     </script>
 </body>
-    </html>
-    
+</html>
