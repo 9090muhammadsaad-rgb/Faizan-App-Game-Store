@@ -42,12 +42,15 @@
         .d-header { position: sticky; top: 0; background: var(--p-bg); padding: 15px; border-bottom: 1px solid var(--p-border); z-index: 10; display: flex; align-items: center; }
         .hero-section { padding: 20px; display: flex; align-items: center; gap: 15px; }
         .hero-section img { width: 85px; height: 85px; border-radius: 22%; border: 1px solid var(--p-border); }
-        .dl-btn { display: block; width: 100%; background: var(--p-green); color: white; padding: 16px; border-radius: 12px; font-weight: 700; text-decoration: none; text-align: center; }
+        
+        /* Fixed Media/Screenshots styling */
+        .gallery { display: flex; gap: 12px; overflow-x: auto; padding: 10px 20px; scrollbar-width: none; }
+        .gallery img, .gallery video { height: 180px; width: auto; border-radius: 12px; flex-shrink: 0; border: 1px solid var(--p-border); background: #eee; }
 
-        /* Gallery/Screenshots styling */
-        .gallery { display: flex; gap: 12px; overflow-x: auto; padding: 15px 20px; scrollbar-width: none; }
-        .gallery::-webkit-scrollbar { display: none; }
-        .gallery img { height: 200px; width: auto; border-radius: 12px; border: 1px solid var(--p-border); flex-shrink: 0; background: #f0f0f0; }
+        .desc-section { padding: 0 20px 20px; font-size: 14px; color: #5f6368; line-height: 1.5; white-space: pre-line; }
+        [data-theme="dark"] .desc-section { color: #aaa; }
+
+        .dl-btn { display: block; width: 100%; background: var(--p-green); color: white; padding: 16px; border-radius: 12px; font-weight: 700; text-decoration: none; text-align: center; }
 
         nav { position: fixed; bottom: 0; width: 100%; background: var(--p-bg); border-top: 1px solid var(--p-border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 4000; }
         .nav-link { border: none; background: none; color: gray; font-size: 12px; flex: 1; cursor: pointer; }
@@ -64,7 +67,6 @@
     </header>
 
     <div class="overlay" id="overlay" onclick="toggleDrawer(false)"></div>
-    
     <div id="drawer">
         <div style="font-size: 20px; font-weight: 700; color: var(--p-green); margin-bottom: 20px;">Settings</div>
         <button class="drawer-btn" onclick="sortData('size-h')">📈 High To Lowest Size</button>
@@ -73,28 +75,21 @@
         <button class="drawer-btn" onclick="sortData('date-o')">📅 Oldest To Newest</button>
         <button class="drawer-btn" onclick="setTheme('dark')">🌙 Dark Mode</button>
         <button class="drawer-btn" onclick="setTheme('light')">☀️ White Mode</button>
-        <button class="drawer-btn" onclick="sortData('default')" style="color:var(--p-green); font-weight:bold;">🔄 Default All</button>
         <button onclick="toggleDrawer(false)" style="width:100%; padding:15px; background:var(--p-active); color:var(--p-green); border:none; border-radius:10px; margin-top:20px; font-weight:bold;">CLOSE</button>
     </div>
 
     <div class="container" id="page-content"></div>
 
     <div id="details">
-        <div class="d-header">
-            <button onclick="closeDetails()" style="background:none; border:none; font-size:24px; color:var(--p-txt);">←</button>
-            <span id="d-nav-title" style="margin-left:15px; font-weight:700;"></span>
-        </div>
+        <div class="d-header"><button onclick="closeDetails()" style="background:none; border:none; font-size:24px;">←</button><span id="d-nav-title" style="margin-left:15px; font-weight:700;"></span></div>
         <div id="d-hero"></div>
         <div id="d-specs" style="padding: 0 20px;"></div>
         
         <div class="gallery" id="d-gallery"></div>
         
-        <div class="dl-section" id="d-versions" style="padding:20px;"></div>
+        <div class="desc-section" id="d-desc"></div>
         
-        <div class="rec-section" style="padding:20px; background:var(--p-surface);">
-            <h4 style="margin-bottom:15px;">RECOMMENDED</h4>
-            <div class="grid" id="d-recs" style="grid-template-columns: repeat(3, 1fr); padding:0;"></div>
-        </div>
+        <div class="dl-section" id="d-versions" style="padding:20px;"></div>
     </div>
 
     <nav>
@@ -121,123 +116,87 @@
             container.innerHTML = "";
             let filtered = type === 'all' ? db : db.filter(a => a.type === type);
 
-            // 1. OFFER SECTION
+            // 1. OFFERS
             const offers = filtered.slice().sort(() => 0.5 - Math.random()).slice(0, 4);
             if(offers.length > 0) {
-                container.innerHTML += `<div class="section-title">${type === 'all' ? 'Featured' : type.toUpperCase() + ' Offers'} <span>Recommended</span></div>`;
-                let offerHtml = `<div class="offer-row">`;
-                offers.forEach(a => {
-                    offerHtml += `
-                        <div class="offer-card" onclick="openDetails('${a.id}')">
-                            <img src="${(a.media && a.media.length > 0) ? a.media[0] : a.icon}" onerror="this.src='https://via.placeholder.com/300x160'">
-                            <div class="offer-info"><b>${a.name}</b><br><small>Premium Unlock</small></div>
-                        </div>`;
-                });
-                container.innerHTML += offerHtml + `</div>`;
+                container.innerHTML += `<div class="section-title">Exclusive Offers <span>See All</span></div><div class="offer-row">` + 
+                offers.map(a => `
+                    <div class="offer-card" onclick="openDetails('${a.id}')">
+                        <img src="${(a.media && a.media[0]) ? a.media[0] : a.icon}">
+                        <div class="offer-info"><b>${a.name}</b><br><small>Premium Mod</small></div>
+                    </div>`).join('') + `</div>`;
             }
 
-            // 2. TRENDING SECTION
-            const trending = filtered.filter(a => a.isTrending).sort(() => 0.5 - Math.random());
+            // 2. TRENDING
+            const trending = filtered.filter(a => a.isTrending);
             if(trending.length > 0) {
-                container.innerHTML += `<div class="section-title">Trending Now <span>🔥</span></div>`;
-                let gridHtml = `<div class="grid">`;
-                trending.slice(0, 4).forEach(a => gridHtml += appCard(a));
-                container.innerHTML += gridHtml + `</div>`;
+                container.innerHTML += `<div class="section-title">Trending Now <span>🔥</span></div><div class="grid">` + 
+                trending.slice(0, 4).map(a => appCard(a)).join('') + `</div>`;
             }
 
-            // 3. RANDOM CATEGORY SECTION
-            if(type === 'all') {
-                const allCats = [...new Set(db.map(a => a.category))].filter(c => c).sort(() => 0.5 - Math.random());
-                if(allCats[0]) {
-                    const catApps = db.filter(a => a.category === allCats[0]).slice(0, 4);
-                    container.innerHTML += `<div class="section-title">Top ${allCats[0]} <span>Explore</span></div>`;
-                    let gridHtml = `<div class="grid">`;
-                    catApps.forEach(a => gridHtml += appCard(a));
-                    container.innerHTML += gridHtml + `</div>`;
-                }
-            }
-
-            // 4. GENERAL GRID
-            container.innerHTML += `<div class="section-title">All ${type === 'all' ? 'Contents' : type + 's'}</div>`;
-            let restHtml = `<div class="grid">`;
-            filtered.forEach(a => restHtml += appCard(a));
-            container.innerHTML += restHtml + `</div>`;
+            // 3. ALL GRID
+            container.innerHTML += `<div class="section-title">All Items</div><div class="grid">` + 
+            filtered.map(a => appCard(a)).join('') + `</div>`;
         }
 
         function appCard(a) {
-            return `
-                <div class="app-card" onclick="openDetails('${a.id}')">
-                    ${a.isNew ? `<div class="new-badge">NEW</div>` : ''}
-                    <img src="${a.icon}" onerror="this.src='https://via.placeholder.com/150'">
-                    <div class="app-name">${a.name}</div>
-                    <div style="font-size:9px; color:gray;">${a.size} • ${a.type.toUpperCase()}</div>
-                </div>`;
+            return `<div class="app-card" onclick="openDetails('${a.id}')">
+                ${a.isNew ? '<div class="new-badge">NEW</div>' : ''}
+                <img src="${a.icon}">
+                <div class="app-name">${a.name}</div>
+                <div style="font-size:9px; color:gray;">${a.size}</div>
+            </div>`;
         }
 
-        // FIXED: openDetails function with screenshot rendering
         function openDetails(id) {
             const a = db.find(x => x.id === id);
-            if(!a) return;
-
             document.getElementById('d-nav-title').innerText = a.name;
-            document.getElementById('d-hero').innerHTML = `<div class="hero-section"><img src="${a.icon}"><div><h2>${a.name}</h2><p style="color:var(--p-green); font-size:12px;">Official Build</p></div></div>`;
-            document.getElementById('d-specs').innerHTML = `<div style="background:var(--p-surface); padding:15px; border-radius:12px; font-size:13px;"><b>Size:</b> ${a.size} | <b>Category:</b> ${a.category || 'N/A'}<br><b>Updated:</b> ${a.lastUpdate || a.uploadedDate || 'Recently'}</div>`;
+            document.getElementById('d-hero').innerHTML = `<div class="hero-section"><img src="${a.icon}"><div><h2>${a.name}</h2></div></div>`;
+            document.getElementById('d-specs').innerHTML = `<div style="background:var(--p-surface); padding:15px; border-radius:12px; font-size:13px; margin-bottom:15px;"><b>Size:</b> ${a.size} | <b>Category:</b> ${a.category}</div>`;
             
-            // SCREENSHOTS LOADING LOGIC
+            // Fixed Media (Video aur Image dono ke liye)
             const gal = document.getElementById('d-gallery');
-            gal.innerHTML = ""; // Pehle purani images clear karein
-            
-            if (a.media && a.media.length > 0) {
+            gal.innerHTML = ""; 
+            if(a.media && a.media.length > 0) {
                 a.media.forEach(m => {
-                    const img = document.createElement('img');
-                    img.src = m;
-                    img.onerror = () => img.style.display = 'none'; // Agar path galat ho toh hide ho jaye
-                    gal.appendChild(img);
+                    if(m.endsWith('.mp4') || m.endsWith('.webm')) {
+                        gal.innerHTML += `<video src="${m}" controls></video>`;
+                    } else {
+                        gal.innerHTML += `<img src="${m}" onerror="this.style.display='none'">`;
+                    }
                 });
                 gal.style.display = 'flex';
-            } else {
-                gal.style.display = 'none';
-            }
+            } else { gal.style.display = 'none'; }
 
-            // VERSIONS
+            // Description Load
+            document.getElementById('d-desc').innerText = a.description || "No description provided.";
+
             document.getElementById('d-versions').innerHTML = (a.versions || []).map(v => `
                 <div style="background:var(--p-surface); padding:15px; border-radius:12px; margin-bottom:10px;">
                     <b>Version: ${v.ver}</b> (${v.size})<br><br>
                     <a href="${v.url}" class="dl-btn">Download Apk</a>
                 </div>`).join('');
 
-            // RECOMMENDATIONS
-            const recs = db.filter(x => x.category === a.category && x.id !== a.id).slice(0, 3);
-            document.getElementById('d-recs').innerHTML = recs.map(r => `
-                <div class="app-card" onclick="openDetails('${r.id}')">
-                    <img src="${r.icon}">
-                    <div class="app-name" style="font-size:10px;">${r.name}</div>
-                </div>`).join('');
-
             document.getElementById('details').style.display = 'block';
             document.body.style.overflow = 'hidden';
-            document.getElementById('details').scrollTop = 0;
         }
 
         // SEARCH COMMANDS
         document.getElementById('search').addEventListener('input', e => {
             const val = e.target.value.toLowerCase().trim();
-            const container = document.getElementById('page-content');
             if(val === 'all') { renderPage('all'); return; }
             if(val === 'allgame') { renderPage('game'); return; }
             if(val === 'allapp') { renderPage('app'); return; }
             if(val.length < 2) { renderPage(currentTab); return; }
-
             const filtered = db.filter(x => x.name.toLowerCase().includes(val) || (x.keywords && x.keywords.toLowerCase().includes(val)));
-            container.innerHTML = `<div class="section-title">Search Results</div><div class="grid">` + filtered.map(a => appCard(a)).join('') + `</div>`;
+            document.getElementById('page-content').innerHTML = `<div class="section-title">Results</div><div class="grid">` + filtered.map(a => appCard(a)).join('') + `</div>`;
         });
 
         function sortData(type) {
-            if (type === 'size-h') db.sort((a,b) => (parseFloat(b.size) || 0) - (parseFloat(a.size) || 0));
-            if (type === 'size-l') db.sort((a,b) => (parseFloat(a.size) || 0) - (parseFloat(b.size) || 0));
-            if (type === 'date-n') db.sort((a,b) => new Date(b.uploadedDate || 0) - new Date(a.uploadedDate || 0));
-            if (type === 'date-o') db.sort((a,b) => new Date(a.uploadedDate || 0) - new Date(b.uploadedDate || 0));
-            if (type === 'default') init();
+            if (type === 'size-h') db.sort((a,b) => parseFloat(b.size) - parseFloat(a.size));
+            if (type === 'size-l') db.sort((a,b) => parseFloat(a.size) - parseFloat(b.size));
+            if (type === 'date-n') db.sort((a,b) => new Date(b.uploadedDate) - new Date(a.uploadedDate));
+            if (type === 'date-o') db.sort((a,b) => new Date(a.uploadedDate) - new Date(b.uploadedDate));
             renderPage(currentTab);
             toggleDrawer(false);
         }
@@ -255,5 +214,4 @@
         init();
     </script>
 </body>
-            </html>
-    
+</html>
