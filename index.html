@@ -43,11 +43,10 @@
         .hero-section { padding: 20px; display: flex; align-items: center; gap: 15px; }
         .hero-section img { width: 85px; height: 85px; border-radius: 22%; border: 1px solid var(--p-border); }
         
-        /* Fixed Media/Screenshots styling */
         .gallery { display: flex; gap: 12px; overflow-x: auto; padding: 10px 20px; scrollbar-width: none; }
         .gallery img, .gallery video { height: 180px; width: auto; border-radius: 12px; flex-shrink: 0; border: 1px solid var(--p-border); background: #eee; }
 
-        .desc-section { padding: 0 20px 20px; font-size: 14px; color: #5f6368; line-height: 1.5; white-space: pre-line; }
+        .desc-section { padding: 10px 20px 20px; font-size: 14px; color: #5f6368; line-height: 1.5; white-space: pre-line; border-bottom: 1px solid var(--p-border); margin-bottom: 20px;}
         [data-theme="dark"] .desc-section { color: #aaa; }
 
         .dl-btn { display: block; width: 100%; background: var(--p-green); color: white; padding: 16px; border-radius: 12px; font-weight: 700; text-decoration: none; text-align: center; }
@@ -81,14 +80,11 @@
     <div class="container" id="page-content"></div>
 
     <div id="details">
-        <div class="d-header"><button onclick="closeDetails()" style="background:none; border:none; font-size:24px;">←</button><span id="d-nav-title" style="margin-left:15px; font-weight:700;"></span></div>
+        <div class="d-header"><button onclick="closeDetails()" style="background:none; border:none; font-size:24px; color:var(--p-txt);">←</button><span id="d-nav-title" style="margin-left:15px; font-weight:700;"></span></div>
         <div id="d-hero"></div>
         <div id="d-specs" style="padding: 0 20px;"></div>
-        
         <div class="gallery" id="d-gallery"></div>
-        
         <div class="desc-section" id="d-desc"></div>
-        
         <div class="dl-section" id="d-versions" style="padding:20px;"></div>
     </div>
 
@@ -108,7 +104,7 @@
                 const data = await res.json();
                 db = data.apps;
                 renderPage('all');
-            } catch (e) { console.error("JSON Error"); }
+            } catch (e) { console.error("JSON Load Fail"); }
         }
 
         function renderPage(type) {
@@ -116,27 +112,22 @@
             container.innerHTML = "";
             let filtered = type === 'all' ? db : db.filter(a => a.type === type);
 
-            // 1. OFFERS
+            // OFFERS
             const offers = filtered.slice().sort(() => 0.5 - Math.random()).slice(0, 4);
             if(offers.length > 0) {
                 container.innerHTML += `<div class="section-title">Exclusive Offers <span>See All</span></div><div class="offer-row">` + 
-                offers.map(a => `
-                    <div class="offer-card" onclick="openDetails('${a.id}')">
-                        <img src="${(a.media && a.media[0]) ? a.media[0] : a.icon}">
-                        <div class="offer-info"><b>${a.name}</b><br><small>Premium Mod</small></div>
-                    </div>`).join('') + `</div>`;
+                offers.map(a => `<div class="offer-card" onclick="openDetails('${a.id}')"><img src="${(a.media && a.media[0]) ? a.media[0] : a.icon}"><div class="offer-info"><b>${a.name}</b></div></div>`).join('') + `</div>`;
             }
 
-            // 2. TRENDING
+            // TRENDING
             const trending = filtered.filter(a => a.isTrending);
             if(trending.length > 0) {
                 container.innerHTML += `<div class="section-title">Trending Now <span>🔥</span></div><div class="grid">` + 
                 trending.slice(0, 4).map(a => appCard(a)).join('') + `</div>`;
             }
 
-            // 3. ALL GRID
-            container.innerHTML += `<div class="section-title">All Items</div><div class="grid">` + 
-            filtered.map(a => appCard(a)).join('') + `</div>`;
+            // ALL GRID
+            container.innerHTML += `<div class="section-title">All Items</div><div class="grid">` + filtered.map(a => appCard(a)).join('') + `</div>`;
         }
 
         function appCard(a) {
@@ -152,24 +143,31 @@
             const a = db.find(x => x.id === id);
             document.getElementById('d-nav-title').innerText = a.name;
             document.getElementById('d-hero').innerHTML = `<div class="hero-section"><img src="${a.icon}"><div><h2>${a.name}</h2></div></div>`;
-            document.getElementById('d-specs').innerHTML = `<div style="background:var(--p-surface); padding:15px; border-radius:12px; font-size:13px; margin-bottom:15px;"><b>Size:</b> ${a.size} | <b>Category:</b> ${a.category}</div>`;
             
-            // Fixed Media (Video aur Image dono ke liye)
+            // DATES Logic: Show only if exists
+            let dateHtml = `<b>Size:</b> ${a.size} | <b>Category:</b> ${a.category}`;
+            if(a.releaseDate) dateHtml += `<br><b>Release Date:</b> ${a.releaseDate}`;
+            if(a.uploadedDate) dateHtml += `<br><b>Uploaded Date:</b> ${a.uploadedDate}`;
+            
+            document.getElementById('d-specs').innerHTML = `<div style="background:var(--p-surface); padding:15px; border-radius:12px; font-size:13px; margin-bottom:15px;">${dateHtml}</div>`;
+            
+            // MEDIA Fix
             const gal = document.getElementById('d-gallery');
             gal.innerHTML = ""; 
             if(a.media && a.media.length > 0) {
                 a.media.forEach(m => {
-                    if(m.endsWith('.mp4') || m.endsWith('.webm')) {
-                        gal.innerHTML += `<video src="${m}" controls></video>`;
-                    } else {
-                        gal.innerHTML += `<img src="${m}" onerror="this.style.display='none'">`;
-                    }
+                    if(m.toLowerCase().endsWith('.mp4') || m.toLowerCase().endsWith('.webm')) gal.innerHTML += `<video src="${m}" controls></video>`;
+                    else gal.innerHTML += `<img src="${m}" onerror="this.style.display='none'">`;
                 });
                 gal.style.display = 'flex';
             } else { gal.style.display = 'none'; }
 
-            // Description Load
-            document.getElementById('d-desc').innerText = a.description || "No description provided.";
+            // DESCRIPTION Logic: Show only if exists
+            const descEl = document.getElementById('d-desc');
+            if(a.description) {
+                descEl.innerText = a.description;
+                descEl.style.display = 'block';
+            } else { descEl.style.display = 'none'; }
 
             document.getElementById('d-versions').innerHTML = (a.versions || []).map(v => `
                 <div style="background:var(--p-surface); padding:15px; border-radius:12px; margin-bottom:10px;">
@@ -179,9 +177,9 @@
 
             document.getElementById('details').style.display = 'block';
             document.body.style.overflow = 'hidden';
+            document.getElementById('details').scrollTop = 0;
         }
 
-        // SEARCH COMMANDS
         document.getElementById('search').addEventListener('input', e => {
             const val = e.target.value.toLowerCase().trim();
             if(val === 'all') { renderPage('all'); return; }
@@ -195,8 +193,8 @@
         function sortData(type) {
             if (type === 'size-h') db.sort((a,b) => parseFloat(b.size) - parseFloat(a.size));
             if (type === 'size-l') db.sort((a,b) => parseFloat(a.size) - parseFloat(b.size));
-            if (type === 'date-n') db.sort((a,b) => new Date(b.uploadedDate) - new Date(a.uploadedDate));
-            if (type === 'date-o') db.sort((a,b) => new Date(a.uploadedDate) - new Date(b.uploadedDate));
+            if (type === 'date-n') db.sort((a,b) => new Date(b.uploadedDate || 0) - new Date(a.uploadedDate || 0));
+            if (type === 'date-o') db.sort((a,b) => new Date(a.uploadedDate || 0) - new Date(b.uploadedDate || 0));
             renderPage(currentTab);
             toggleDrawer(false);
         }
