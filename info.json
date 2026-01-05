@@ -1,38 +1,33 @@
 {
   "apps": [
     {
-      "id": "g1",
-      "name": "GTA 5 Mobile",
+      "id": "minecraft",
+      "isTrending": true,
       "type": "game",
-      "category": "Action",
-      "size": "2.4 GB",
-      "releaseDate": "2026-01-01",
-      "icon": "icon.png",
-      "description": "High graphics action game for all Android devices. Experience the open world like never before.",
+      "name": "Minecraft - MOD",
+      "category": "minecraft، survival",
+      "keywords": "minecraft , Minecraft , mojang , mincraft ",
+      "releaseDate": "",
+      "IsNew" true,
+      "Isnew" true,
+      "uploadedDate": "2026-01-05",
+      "lastUpdate": "",
+      "icon": "icons/minecraft_icon.jpg",
+      "size": "Default",
+      "manualRecs": [],
       "media": [
-        "shot1.jpeg",
-        "shot2.jpg",
-        "shot3.png",
-        "shot4.webp",
-        "video.mp4"
+        "assets/minecraft/minecraft_screenshot1.jpg",
+        "assets/minecraft/minecraft_screenshot2.jpg",
+        "assets/minecraft/minecraft_screenshot4.jpg",
+        "assets/minecraft/minecraft_screenshot5.jpg",
+        "assets/minecraft/minecraft_screenshot3.jpg"
       ],
       "versions": [
-        { "ver": "v1.5 Premium", "size": "2.4 GB", "url": "https://example.com/gta.apk" },
-        { "ver": "v1.2 Lite", "size": "800 MB", "url": "https://example.com/gta_lite.apk" }
-      ]
-    },
-    {
-      "id": "a1",
-      "name": "Photoshop Mod",
-      "type": "app",
-      "category": "Editing",
-      "size": "150 MB",
-      "releaseDate": "2025-12-15",
-      "icon": "photo.jpeg",
-      "description": "Professional photo editing with all filters unlocked.",
-      "media": [],
-      "versions": [
-        { "ver": "2025.1", "size": "150 MB", "url": "#" }
+        {
+          "ver": "Default",
+          "size": "885.4MB",
+          "url": ""
+        }
       ]
     }
   ]
